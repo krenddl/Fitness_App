@@ -1,0 +1,80 @@
+@page "/login"
+@inject AuthService AuthService
+@inject ApiService Api
+@inject NavigationManager Navigation
+
+<PageTitle>Вход</PageTitle>
+
+<div class="auth-shell">
+    <div class="auth-card">
+        <p class="eyebrow">PulseBoard Secure Access</p>
+        <h1 class="hero">Вход в систему</h1>
+        <p class="subtitle">JWT-сессия сохраняется в браузере, а доступ к функциям зависит от роли пользователя.</p>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert-strip">@errorMessage</div>
+        }
+
+        <EditForm Model="@login" OnValidSubmit="HandleLogin">
+            <div class="auth-grid">
+                <InputText class="auth-input" @bind-Value="login.Email" placeholder="Email" />
+                <InputText class="auth-input" @bind-Value="login.Password" placeholder="Пароль" type="password" />
+            </div>
+            <button class="btn-main auth-button" type="submit">Войти</button>
+        </EditForm>
+
+        <div class="demo-wrap">
+            <p class="section-kicker">Демо-аккаунты</p>
+            @foreach (var account in demoAccounts)
+            {
+                <button class="demo-card" @onclick="() => UseDemo(account)">
+                    <strong>@account.Role</strong>
+                    <span>@account.Email</span>
+                    <small>@account.Password</small>
+                </button>
+            }
+        </div>
+
+        <p class="switch-text">Нет аккаунта? <NavLink href="register">Регистрация</NavLink></p>
+    </div>
+</div>
+
+@code {
+    private LoginRequestModel login = new();
+    private List<DemoAccountModel> demoAccounts = new();
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthService.GetStoredSessionAsync();
+        if (!string.IsNullOrWhiteSpace(session?.Token))
+        {
+            Navigation.NavigateTo("/", true);
+            return;
+        }
+
+        var demo = await Api.GetDemoAccounts();
+        demoAccounts = demo?.Accounts ?? new();
+    }
+
+    private async Task HandleLogin()
+    {
+        errorMessage = string.Empty;
+        var result = await AuthService.LoginAsync(login);
+
+        if (result is not null && result.Status && !string.IsNullOrWhiteSpace(result.Token))
+        {
+            Navigation.NavigateTo("/", true);
+            return;
+        }
+
+        errorMessage = string.IsNullOrWhiteSpace(result?.Message) ? "Не удалось выполнить вход." : result!.Message;
+    }
+
+    private void UseDemo(DemoAccountModel account)
+    {
+        login.Email = account.Email;
+        login.Password = account.Password;
+    }
+}

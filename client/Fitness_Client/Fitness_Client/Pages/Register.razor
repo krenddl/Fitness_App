@@ -1,0 +1,59 @@
+@page "/register"
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Регистрация</PageTitle>
+
+<div class="auth-shell">
+    <div class="auth-card">
+        <p class="eyebrow">Client Registration</p>
+        <h1 class="hero">Создать аккаунт клиента</h1>
+        <p class="subtitle">Регистрация создает пользователя с ролью `Client`, а затем вы входите через JWT-авторизацию.</p>
+
+        @if (!string.IsNullOrWhiteSpace(statusMessage))
+        {
+            <div class="alert-strip success">@statusMessage</div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert-strip">@errorMessage</div>
+        }
+
+        <EditForm Model="@registration" OnValidSubmit="HandleRegister">
+            <div class="auth-grid">
+                <InputText class="auth-input" @bind-Value="registration.Name" placeholder="ФИО" />
+                <InputText class="auth-input" @bind-Value="registration.Phone" placeholder="Телефон" />
+                <InputText class="auth-input" @bind-Value="registration.Email" placeholder="Email" />
+                <InputText class="auth-input" @bind-Value="registration.Password" placeholder="Пароль" type="password" />
+            </div>
+            <button class="btn-main auth-button" type="submit">Зарегистрироваться</button>
+        </EditForm>
+
+        <p class="switch-text">Уже есть аккаунт? <NavLink href="login">Вход</NavLink></p>
+    </div>
+</div>
+
+@code {
+    private RegistrationRequestModel registration = new();
+    private string statusMessage = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = string.Empty;
+        statusMessage = string.Empty;
+
+        var result = await AuthService.RegisterAsync(registration);
+
+        if (result is not null && result.Status)
+        {
+            statusMessage = string.IsNullOrWhiteSpace(result.Message) ? "Регистрация прошла успешно." : result.Message;
+            await Task.Delay(800);
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        errorMessage = string.IsNullOrWhiteSpace(result?.Message) ? "Не удалось зарегистрироваться." : result!.Message;
+    }
+}

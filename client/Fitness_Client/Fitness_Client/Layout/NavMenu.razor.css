@@ -1,0 +1,12 @@
+.navbar-toggler { border: 1px solid rgba(255,255,255,.25); color: #eaf3ff; background: transparent; border-radius: 10px; padding: .35rem .8rem; }
+.top-row { height: 4rem; background: transparent; }
+.navbar-brand { color: #ffffff; font-weight: 800; letter-spacing: .5px; font-size: 1.28rem; text-decoration: none; }
+.nav-item { margin: .4rem 0; }
+.nav-item ::deep a { color: #d7e7ff; border-radius: 12px; padding: .75rem 1rem; text-decoration: none; border: 1px solid transparent; }
+.nav-item ::deep a.active, .nav-item ::deep a:hover { background: rgba(116,171,255,.15); border-color: rgba(116,171,255,.3); }
+.nav-button { width: 100%; text-align: left; background: transparent; color: #d7e7ff; border: 1px solid transparent; }
+@media (min-width: 901px) {
+    .navbar-toggler { display: none; }
+    .collapse { display: block; }
+    .nav-scrollable { height: calc(100vh - 4rem); overflow-y: auto; }
+}

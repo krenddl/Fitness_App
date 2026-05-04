@@ -1,0 +1,575 @@
+@page "/"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.SignalR.Client
+@inject ApiService Api
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<PageTitle>Панель</PageTitle>
+
+@if (currentUser is null)
+{
+    <p class="subtitle">Загрузка панели...</p>
+}
+else
+{
+    <div class="welcome-bar">
+        <div>
+            <p class="eyebrow">Role-based control panel</p>
+            <h1 class="hero">@currentUser.Name</h1>
+            <p class="subtitle">@RoleDescription</p>
+        </div>
+        <span class="role-badge">@currentUser.Role</span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert-strip success">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert-strip">@errorMessage</div>
+    }
+
+    @if (IsAdminOrSales && summary is not null)
+    {
+        <div class="kpi-grid">
+            <div class="kpi"><span>Активные</span><strong>@summary.Active</strong></div>
+            <div class="kpi"><span>Замороженные</span><strong>@summary.Frozen</strong></div>
+            <div class="kpi"><span>Посещения</span><strong>@summary.Attendance</strong></div>
+            <div class="kpi"><span>Загрузка</span><strong>@summary.Occupancy%</strong></div>
+            <div class="kpi"><span>Выручка</span><strong>@summary.Revenue ₽</strong></div>
+            <div class="kpi"><span>Планы</span><strong>@summary.PlansInProgress</strong></div>
+        </div>
+    }
+
+    <div class="panel-grid">
+        @if (IsAdmin)
+        {
+            <section class="card">
+                <h3>Пользователи и роли</h3>
+                <div class="row2">
+                    <input @bind="newUser.Name" placeholder="Имя" />
+                    <input @bind="newUser.Email" placeholder="Email" />
+                    <input @bind="newUser.Password" placeholder="Пароль" />
+                    <select @bind="newUser.Role_Id">
+                        <option value="2">Client</option>
+                        <option value="3">Trainer</option>
+                        <option value="4">SalesManager</option>
+                    </select>
+                    <input @bind="newUser.Phone" placeholder="Телефон" />
+                    <input @bind="newUser.Specialization" placeholder="Специализация тренера" />
+                </div>
+                <button class="btn-main" @onclick="CreateUser">Создать пользователя</button>
+                <div class="list">
+                    @foreach (var user in users)
+                    {
+                        <div class="line"><span>@user.Name | @user.Role | @user.Email</span></div>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (IsAdminOrSales)
+        {
+            <section class="card">
+                <h3>Абонементы и продажи</h3>
+                <div class="row2">
+                    <input @bind="newMembership.ClientId" type="number" placeholder="ClientId" />
+                    <input @bind="newMembership.Type" placeholder="Тип" />
+                    <input @bind="newMembership.StartDate" type="date" @bind:format="yyyy-MM-dd" />
+                    <input @bind="newMembership.EndDate" type="date" @bind:format="yyyy-MM-dd" />
+                </div>
+                <button class="btn-main" @onclick="CreateMembership">Продать абонемент</button>
+                <button class="btn-sub" @onclick="LoadReminders">Получить напоминания</button>
+                <div class="list">
+                    @foreach (var membership in memberships.Take(12))
+                    {
+                        <div class="line">
+                            <span>#@membership.Id C@membership.ClientId @membership.Type @membership.Status</span>
+                            <div>
+                                <button class="btn-sub" @onclick="() => FreezeMembership(membership.Id)">Заморозка</button>
+                                <button class="btn-sub" @onclick="() => ExtendMembership(membership.Id)">+30</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if (reminders.Any())
+                {
+                    <p class="section-kicker">Напоминания по истечению</p>
+                    <div class="list">
+                        @foreach (var reminder in reminders.Take(6))
+                        {
+                            <div class="line"><span>C@reminder.ClientId истекает @reminder.EndDate.ToShortDateString()</span></div>
+                        }
+                    </div>
+                }
+            </section>
+        }
+
+        @if (IsAdmin)
+        {
+            <section class="card">
+                <h3>Расписание клуба</h3>
+                <div class="row2">
+                    <input @bind="newWorkout.Title" placeholder="Название" />
+                    <input @bind="newWorkout.TrainerId" type="number" placeholder="TrainerId" />
+                    <input @bind="newWorkout.StartAt" type="datetime-local" @bind:format="yyyy-MM-ddTHH:mm" />
+                    <input @bind="newWorkout.Capacity" type="number" placeholder="Мест" />
+                </div>
+                <button class="btn-main" @onclick="CreateWorkout">Создать занятие</button>
+                <div class="list">
+                    @foreach (var workout in workouts.Take(12))
+                    {
+                        <div class="line"><span>#@workout.Id @workout.Title | T@workout.TrainerId | @workout.ClientIds.Count/@workout.Capacity</span></div>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (IsSales)
+        {
+            <section class="card">
+                <h3>Клиенты для продаж</h3>
+                <div class="list">
+                    @foreach (var client in clients.Take(16))
+                    {
+                        <div class="line"><span>@client.FullName | @client.Phone</span></div>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (IsTrainer)
+        {
+            <section class="card">
+                <h3>Профиль тренера</h3>
+                @if (myTrainer is not null)
+                {
+                    <div class="line"><span>@myTrainer.FullName | @myTrainer.Specialization</span></div>
+                }
+                <p class="section-kicker">Мои занятия</p>
+                <div class="row2">
+                    <input @bind="newWorkout.Title" placeholder="Название" />
+                    <input @bind="newWorkout.StartAt" type="datetime-local" @bind:format="yyyy-MM-ddTHH:mm" />
+                    <input @bind="newWorkout.Capacity" type="number" placeholder="Мест" />
+                </div>
+                <button class="btn-main" @onclick="CreateWorkout">Добавить занятие</button>
+                <div class="list">
+                    @foreach (var workout in workouts)
+                    {
+                        <div class="line"><span>@workout.Title | @workout.StartAt | @workout.ClientIds.Count/@workout.Capacity</span></div>
+                    }
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>Планы и прогресс клиентов</h3>
+                <div class="row2">
+                    <input @bind="newPlan.ClientId" type="number" placeholder="ClientId" />
+                    <input @bind="newPlan.TrainingPlan" placeholder="План тренировок" />
+                    <input @bind="newPlan.NutritionPlan" placeholder="План питания" />
+                    <input @bind="progressValue" type="number" placeholder="Прогресс %" />
+                </div>
+                <button class="btn-main" @onclick="CreatePlan">Создать план</button>
+                <button class="btn-sub" @onclick="UpdatePlanProgress">Обновить прогресс</button>
+                <input class="auth-input mt" @bind="progressPlanId" type="number" placeholder="PlanId" />
+                <div class="list">
+                    @foreach (var plan in plans)
+                    {
+                        <div class="line"><span>#@plan.Id C@plan.ClientId | @plan.ProgressPercent%</span></div>
+                    }
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>Чат и push</h3>
+                <div class="row2">
+                    <input @bind="trainerChat.ClientId" type="number" placeholder="ClientId" />
+                    <input @bind="trainerChat.Text" placeholder="Сообщение" />
+                    <input @bind="trainerPush.ClientId" type="number" placeholder="ClientId" />
+                    <input @bind="trainerPush.Text" placeholder="Текст push" />
+                </div>
+                <button class="btn-main" @onclick="SendTrainerChat">Отправить в чат</button>
+                <button class="btn-sub" @onclick="SendTrainerPush">Отправить push</button>
+                <div class="list">
+                    @foreach (var message in chatFeed.TakeLast(10).Reverse())
+                    {
+                        <div class="line"><span>@message.SenderRole C@message.ClientId: @message.Text</span></div>
+                    }
+                </div>
+            </section>
+        }
+
+        @if (IsClient)
+        {
+            <section class="card">
+                <h3>Личный кабинет клиента</h3>
+                @if (myClient is not null)
+                {
+                    <div class="line"><span>@myClient.FullName | @myClient.Phone</span></div>
+                }
+                <p class="section-kicker">Мои абонементы</p>
+                <div class="list">
+                    @foreach (var membership in memberships)
+                    {
+                        <div class="line"><span>@membership.Type | @membership.Status | до @membership.EndDate.ToShortDateString()</span></div>
+                    }
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>Занятия и запись</h3>
+                <div class="list">
+                    @foreach (var workout in workouts.Take(12))
+                    {
+                        <div class="line">
+                            <span>@workout.Title | T@workout.TrainerId | @workout.ClientIds.Count/@workout.Capacity</span>
+                            <button class="btn-sub" @onclick="() => EnrollClient(workout.Id)">Записаться</button>
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>Планы и посещения</h3>
+                <button class="btn-main" @onclick="EnterClub">Отметить вход</button>
+                @if (ActiveVisitId.HasValue)
+                {
+                    <button class="btn-sub" @onclick="ExitClub">Отметить выход</button>
+                }
+                <div class="list">
+                    @foreach (var plan in plans)
+                    {
+                        <div class="line"><span>Тренировки: @plan.TrainingPlan</span></div>
+                        <div class="line"><span>Питание: @plan.NutritionPlan | Прогресс @plan.ProgressPercent%</span></div>
+                    }
+                    @foreach (var visit in visits.Take(8))
+                    {
+                        <div class="line"><span>@visit.AccessType | @visit.EnteredAt.ToLocalTime()</span></div>
+                    }
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>Чат и уведомления</h3>
+                <div class="row2">
+                    <input @bind="clientChat.Text" placeholder="Сообщение тренеру" />
+                </div>
+                <button class="btn-main" @onclick="SendClientChat">Отправить</button>
+                <div class="list">
+                    @foreach (var message in chatFeed.TakeLast(10).Reverse())
+                    {
+                        <div class="line"><span>@message.SenderRole: @message.Text</span></div>
+                    }
+                    @foreach (var notification in pushes.Take(8))
+                    {
+                        <div class="line"><span>@notification.Text</span></div>
+                    }
+                </div>
+            </section>
+        }
+
+        <section class="card">
+            <h3>Live-события</h3>
+            <button class="btn-sub" @onclick="LoadDashboard">Обновить данные</button>
+            <div class="list">
+                @foreach (var log in liveLog.TakeLast(12).Reverse())
+                {
+                    <div class="line"><span>@log</span></div>
+                }
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    private UserSessionModel? currentUser;
+    private ReportSummaryModel? summary;
+    private List<UserSessionModel> users = new();
+    private List<ClientModel> clients = new();
+    private List<TrainerModel> trainers = new();
+    private List<MembershipModel> memberships = new();
+    private List<MembershipModel> reminders = new();
+    private List<WorkoutModel> workouts = new();
+    private List<PlanModel> plans = new();
+    private List<VisitModel> visits = new();
+    private List<ChatMessageModel> chatFeed = new();
+    private List<PushNotificationModel> pushes = new();
+    private List<string> liveLog = new();
+
+    private CreateUserRequestModel newUser = new() { Role_Id = 4 };
+    private MembershipModel newMembership = new() { Type = "Стандарт", StartDate = DateTime.Today, EndDate = DateTime.Today.AddMonths(1) };
+    private WorkoutModel newWorkout = new() { StartAt = DateTime.Now, Capacity = 12 };
+    private PlanModel newPlan = new();
+    private SendChatRequestModel trainerChat = new();
+    private SendPushRequestModel trainerPush = new();
+    private SendChatRequestModel clientChat = new();
+
+    private ClientModel? myClient;
+    private TrainerModel? myTrainer;
+    private int progressPlanId;
+    private int progressValue;
+    private string statusMessage = string.Empty;
+    private string errorMessage = string.Empty;
+    private HubConnection? hub;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboard();
+        await StartHub();
+    }
+
+    private bool IsAdmin => currentUser?.Role == "Administrator";
+    private bool IsSales => currentUser?.Role == "SalesManager";
+    private bool IsTrainer => currentUser?.Role == "Trainer";
+    private bool IsClient => currentUser?.Role == "Client";
+    private bool IsAdminOrSales => IsAdmin || IsSales;
+    private int? ActiveVisitId => visits.FirstOrDefault(x => x.ExitedAt is null)?.Id;
+
+    private string RoleDescription => currentUser?.Role switch
+    {
+        "Administrator" => "Управление ролями, продажами, расписанием и общей аналитикой клуба.",
+        "SalesManager" => "Продажи абонементов, контроль клиентов и напоминаний по продлению.",
+        "Trainer" => "Ваши тренировки, планы клиентов, push-уведомления и чат.",
+        "Client" => "Ваши абонементы, запись на занятия, прогресс, посещения и сообщения тренеру.",
+        _ => string.Empty
+    };
+
+    private async Task LoadDashboard()
+    {
+        statusMessage = string.Empty;
+        errorMessage = string.Empty;
+
+        AuthResponseModel? session = null;
+        try
+        {
+            session = await Api.GetSession();
+        }
+        catch
+        {
+        }
+
+        if (session?.Status != true || session.User is null)
+        {
+            await AuthService.LogoutAsync();
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        currentUser = session.User;
+        memberships = new();
+        workouts = new();
+        plans = new();
+        visits = new();
+        chatFeed = new();
+        pushes = new();
+        reminders = new();
+        users = new();
+        clients = new();
+        trainers = new();
+
+        if (IsAdmin)
+        {
+            summary = await Api.GetSummary();
+            users = (await Api.GetUsers())?.Users ?? new();
+            clients = await Api.GetClients() ?? new();
+            trainers = await Api.GetTrainers() ?? new();
+            memberships = await Api.GetMemberships() ?? new();
+            workouts = await Api.GetWorkouts() ?? new();
+        }
+
+        if (IsSales)
+        {
+            summary = await Api.GetSummary();
+            clients = await Api.GetClients() ?? new();
+            memberships = await Api.GetMemberships() ?? new();
+        }
+
+        if (IsTrainer)
+        {
+            myTrainer = await Api.GetMyTrainer();
+            workouts = await Api.GetWorkouts() ?? new();
+            plans = await Api.GetPlans() ?? new();
+            chatFeed = await Api.GetChat() ?? new();
+            pushes = await Api.GetPush() ?? new();
+        }
+
+        if (IsClient)
+        {
+            myClient = await Api.GetMyClient();
+            memberships = await Api.GetMemberships() ?? new();
+            workouts = await Api.GetWorkouts() ?? new();
+            plans = await Api.GetPlans() ?? new();
+            visits = await Api.GetVisits() ?? new();
+            chatFeed = await Api.GetChat() ?? new();
+            pushes = await Api.GetPush() ?? new();
+        }
+    }
+
+    private async Task StartHub()
+    {
+        var session = await AuthService.GetStoredSessionAsync();
+        if (string.IsNullOrWhiteSpace(session?.Token))
+        {
+            return;
+        }
+
+        hub = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5294/hubs/notifications", options =>
+            {
+                options.AccessTokenProvider = () => Task.FromResult<string?>(session.Token);
+            })
+            .Build();
+
+        hub.On<ChatMessageModel>("ChatMessage", message =>
+        {
+            chatFeed.Add(message);
+            liveLog.Add($"Новый чат: {message.Text}");
+            InvokeAsync(StateHasChanged);
+        });
+
+        hub.On<PushNotificationModel>("PushNotification", push =>
+        {
+            pushes.Insert(0, push);
+            liveLog.Add($"Push: {push.Text}");
+            InvokeAsync(StateHasChanged);
+        });
+
+        hub.On<object>("WorkoutChanged", _ =>
+        {
+            liveLog.Add("Изменилась заполняемость занятий");
+            InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await hub.StartAsync();
+        }
+        catch
+        {
+            liveLog.Add("Не удалось подключить live-канал.");
+        }
+    }
+
+    private async Task CreateUser()
+    {
+        var response = await Api.CreateUser(newUser);
+        if (response.IsSuccessStatusCode)
+        {
+            statusMessage = "Пользователь создан.";
+            await LoadDashboard();
+        }
+        else
+        {
+            errorMessage = "Не удалось создать пользователя.";
+        }
+    }
+
+    private async Task CreateMembership()
+    {
+        var response = await Api.AddMembership(newMembership);
+        if (response.IsSuccessStatusCode)
+        {
+            statusMessage = "Абонемент оформлен.";
+            await LoadDashboard();
+        }
+        else
+        {
+            errorMessage = "Не удалось оформить абонемент.";
+        }
+    }
+
+    private async Task FreezeMembership(int id)
+    {
+        await Api.FreezeMembership(id);
+        await LoadDashboard();
+    }
+
+    private async Task ExtendMembership(int id)
+    {
+        await Api.ExtendMembership(id, 30);
+        await LoadDashboard();
+    }
+
+    private async Task LoadReminders()
+    {
+        reminders = await Api.GetMembershipReminders() ?? new();
+    }
+
+    private async Task CreateWorkout()
+    {
+        await Api.AddWorkout(newWorkout);
+        await LoadDashboard();
+    }
+
+    private async Task CreatePlan()
+    {
+        await Api.AddPlan(newPlan);
+        await LoadDashboard();
+    }
+
+    private async Task UpdatePlanProgress()
+    {
+        await Api.UpdateProgress(progressPlanId, progressValue);
+        await LoadDashboard();
+    }
+
+    private async Task SendTrainerChat()
+    {
+        await Api.SendChat(trainerChat);
+        trainerChat.Text = string.Empty;
+        await LoadDashboard();
+    }
+
+    private async Task SendTrainerPush()
+    {
+        await Api.SendPush(trainerPush);
+        trainerPush.Text = string.Empty;
+        await LoadDashboard();
+    }
+
+    private async Task EnrollClient(int workoutId)
+    {
+        await Api.Enroll(workoutId, currentUser?.Client_Id ?? 0);
+        await LoadDashboard();
+    }
+
+    private async Task EnterClub()
+    {
+        await Api.Enter(new EnterVisitRequestModel
+        {
+            ClientId = currentUser?.Client_Id ?? 0,
+            AccessType = "QR"
+        });
+        await LoadDashboard();
+    }
+
+    private async Task ExitClub()
+    {
+        if (ActiveVisitId.HasValue)
+        {
+            await Api.Exit(ActiveVisitId.Value);
+            await LoadDashboard();
+        }
+    }
+
+    private async Task SendClientChat()
+    {
+        clientChat.ClientId = currentUser?.Client_Id ?? 0;
+        clientChat.TrainerId = plans.FirstOrDefault()?.TrainerId ?? 0;
+        await Api.SendChat(clientChat);
+        clientChat.Text = string.Empty;
+        await LoadDashboard();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hub is not null)
+        {
+            await hub.DisposeAsync();
+        }
+    }
+}

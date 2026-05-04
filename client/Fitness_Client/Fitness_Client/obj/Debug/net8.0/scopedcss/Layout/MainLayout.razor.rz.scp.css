@@ -1,0 +1,9 @@
+.page[b-mlo8bs51vl] { display: flex; min-height: 100vh; background: var(--bg); }
+main[b-mlo8bs51vl] { flex: 1; }
+.sidebar[b-mlo8bs51vl] { width: 280px; background: linear-gradient(200deg, #112241 0%, #17396a 55%, #0f1729 100%); border-right: 1px solid rgba(255,255,255,.08); }
+.top-row[b-mlo8bs51vl] { height: 64px; display: flex; align-items: center; justify-content: space-between; color: #e5edf9; border-bottom: 1px solid rgba(138,164,201,.2); background: rgba(16,29,52,.65); backdrop-filter: blur(6px); }
+.content[b-mlo8bs51vl] { padding-top: 1.3rem; }
+@media (max-width: 900px) {
+    .page[b-mlo8bs51vl] { flex-direction: column; }
+    .sidebar[b-mlo8bs51vl] { width: 100%; }
+}

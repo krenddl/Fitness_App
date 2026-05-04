@@ -1,0 +1,9 @@
+.page { display: flex; min-height: 100vh; background: var(--bg); }
+main { flex: 1; }
+.sidebar { width: 280px; background: linear-gradient(200deg, #112241 0%, #17396a 55%, #0f1729 100%); border-right: 1px solid rgba(255,255,255,.08); }
+.top-row { height: 64px; display: flex; align-items: center; justify-content: space-between; color: #e5edf9; border-bottom: 1px solid rgba(138,164,201,.2); background: rgba(16,29,52,.65); backdrop-filter: blur(6px); }
+.content { padding-top: 1.3rem; }
+@media (max-width: 900px) {
+    .page { flex-direction: column; }
+    .sidebar { width: 100%; }
+}
