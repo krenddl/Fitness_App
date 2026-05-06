@@ -65,6 +65,13 @@ public class AuthService
         _authStateProvider.NotifyUserLogout();
     }
 
+    public async Task ClearSessionAsync()
+    {
+        _http.DefaultRequestHeaders.Remove("Authorization");
+        await _storage.ClearSessionAsync();
+        _authStateProvider.NotifyUserLogout();
+    }
+
     public async Task<StoredSessionModel?> GetStoredSessionAsync()
     {
         return await _storage.GetSessionAsync();

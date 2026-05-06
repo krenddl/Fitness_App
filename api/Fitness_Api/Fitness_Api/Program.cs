@@ -3,18 +3,27 @@ using Fitness_Api.Hubs;
 using Fitness_Api.Interfaces;
 using Fitness_Api.Services;
 using Fitness_Api.UniversalMethods;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true)
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
 builder.Services.AddSignalR(options =>
@@ -23,9 +32,11 @@ builder.Services.AddSignalR(options =>
     options.MaximumReceiveMessageSize = 1024 * 1024 * 10;
 });
 
-builder.Services.AddSingleton<InMemoryStore>();
+builder.Services.AddDbContext<FitnessDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddSingleton<JwtGenerator>();
-builder.Services.AddSingleton<SessionResolver>();
+builder.Services.AddScoped<SessionResolver>();
 
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IClientServices, ClientServices>();
@@ -39,6 +50,13 @@ builder.Services.AddScoped<IReportServices, ReportServices>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<FitnessDbContext>();
+    context.Database.Migrate();
+    DbInitializer.Seed(context);
+}
+
 app.UseCors();
 
 if (app.Environment.IsDevelopment())
@@ -47,7 +65,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseStaticFiles();
 app.UseAuthorization();
 
 app.MapControllers();

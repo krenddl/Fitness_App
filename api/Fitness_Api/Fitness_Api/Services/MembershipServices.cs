@@ -8,10 +8,10 @@ namespace Fitness_Api.Services;
 
 public class MembershipServices : IMembershipServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
 
-    public MembershipServices(InMemoryStore context, SessionResolver sessionResolver)
+    public MembershipServices(FitnessDbContext context, SessionResolver sessionResolver)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -37,9 +37,9 @@ public class MembershipServices : IMembershipServices
 
     public Task<IActionResult> CreateMembership(Membership membership)
     {
-        membership.Id = _context.NextMembershipId();
         membership.Status = membership.EndDate < DateTime.UtcNow ? MembershipStatus.Expired : MembershipStatus.Active;
         _context.Memberships.Add(membership);
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(membership));
     }
@@ -53,6 +53,7 @@ public class MembershipServices : IMembershipServices
         }
 
         membership.Status = MembershipStatus.Frozen;
+        _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(membership));
     }
 
@@ -66,6 +67,7 @@ public class MembershipServices : IMembershipServices
 
         membership.EndDate = membership.EndDate.AddDays(days);
         membership.Status = MembershipStatus.Active;
+        _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(membership));
     }
 
@@ -73,13 +75,15 @@ public class MembershipServices : IMembershipServices
     {
         var due = _context.Memberships
             .Where(x => !x.ReminderSent && x.EndDate <= DateTime.UtcNow.AddDays(3))
-            .Select(x =>
-            {
-                x.ReminderSent = true;
-                return new { x.Id, x.ClientId, x.EndDate };
-            })
             .ToList();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(due));
+        foreach (var membership in due)
+        {
+            membership.ReminderSent = true;
+        }
+        _context.SaveChanges();
+
+        var result = due.Select(x => new { x.Id, x.ClientId, x.EndDate }).ToList();
+        return Task.FromResult<IActionResult>(new OkObjectResult(result));
     }
 }

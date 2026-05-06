@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\python_pro\\Desktop\\uchebka\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj": {}
+    "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\python_pro\\Desktop\\uchebka\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj": {
+    "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\python_pro\\Desktop\\uchebka\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj",
+        "projectUniqueName": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj",
         "projectName": "Fitness_Api",
-        "projectPath": "C:\\Users\\python_pro\\Desktop\\uchebka\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj",
-        "packagesPath": "C:\\Users\\python_pro\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\python_pro\\Desktop\\uchebka\\api\\Fitness_Api\\Fitness_Api\\obj\\",
+        "projectPath": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Fitness_Api.csproj",
+        "packagesPath": "C:\\Users\\uryuqq\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\python_pro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\uryuqq\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,11 +26,11 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -44,13 +44,33 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
@@ -79,7 +99,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

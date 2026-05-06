@@ -5,9 +5,9 @@ namespace Fitness_Api.UniversalMethods;
 
 public class SessionResolver
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
 
-    public SessionResolver(InMemoryStore context)
+    public SessionResolver(FitnessDbContext context)
     {
         _context = context;
     }

@@ -7,9 +7,9 @@ namespace Fitness_Api.Services;
 
 public class ReportServices : IReportServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
 
-    public ReportServices(InMemoryStore context)
+    public ReportServices(FitnessDbContext context)
     {
         _context = context;
     }
@@ -18,11 +18,11 @@ public class ReportServices : IReportServices
     {
         var active = _context.Memberships.Count(x => x.Status == MembershipStatus.Active);
         var frozen = _context.Memberships.Count(x => x.Status == MembershipStatus.Frozen);
-        var attendance = _context.Visits.Count;
+        var attendance = _context.Visits.Count();
         var totalCapacity = _context.Workouts.Sum(x => x.Capacity);
-        var occupied = _context.Workouts.Sum(x => x.ClientIds.Count);
+        var occupied = _context.Workouts.ToList().Sum(x => x.ClientIds.Count);
         var occupancy = totalCapacity == 0 ? 0 : Math.Round((double)occupied / totalCapacity * 100, 1);
-        var revenue = _context.Memberships.Count * 2500;
+        var revenue = _context.Memberships.Count() * 2500;
 
         return Task.FromResult<IActionResult>(new OkObjectResult(new
         {

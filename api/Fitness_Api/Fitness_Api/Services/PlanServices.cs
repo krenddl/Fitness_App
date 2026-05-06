@@ -8,10 +8,10 @@ namespace Fitness_Api.Services;
 
 public class PlanServices : IPlanServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
 
-    public PlanServices(InMemoryStore context, SessionResolver sessionResolver)
+    public PlanServices(FitnessDbContext context, SessionResolver sessionResolver)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -44,12 +44,13 @@ public class PlanServices : IPlanServices
             return Task.FromResult<IActionResult>(new UnauthorizedObjectResult(new { status = false, message = "Сессия не найдена" }));
         }
 
-        plan.Id = _context.NextPlanId();
         if (user.Role_Id == RoleIds.Trainer && user.Trainer_Id.HasValue)
         {
             plan.TrainerId = user.Trainer_Id.Value;
         }
+
         _context.Plans.Add(plan);
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(plan));
     }
@@ -74,6 +75,7 @@ public class PlanServices : IPlanServices
         }
 
         plan.ProgressPercent = Math.Clamp(progress, 0, 100);
+        _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(plan));
     }
 }

@@ -9,11 +9,11 @@ namespace Fitness_Api.Services;
 
 public class UserServices : IUserServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly JwtGenerator _jwtGenerator;
     private readonly SessionResolver _sessionResolver;
 
-    public UserServices(InMemoryStore context, JwtGenerator jwtGenerator, SessionResolver sessionResolver)
+    public UserServices(FitnessDbContext context, JwtGenerator jwtGenerator, SessionResolver sessionResolver)
     {
         _context = context;
         _jwtGenerator = jwtGenerator;
@@ -22,7 +22,7 @@ public class UserServices : IUserServices
 
     public Task<IActionResult> Registration(Registration regUser)
     {
-        if (_context.Users.Any(x => x.Email.Equals(regUser.Email, StringComparison.OrdinalIgnoreCase)))
+        if (_context.Users.Any(x => x.Email.ToLower() == regUser.Email.ToLower()))
         {
             return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
             {
@@ -33,16 +33,15 @@ public class UserServices : IUserServices
 
         var client = new Client
         {
-            Id = _context.NextClientId(),
             FullName = regUser.Name,
             Phone = regUser.Phone
         };
 
         _context.Clients.Add(client);
+        _context.SaveChanges();
 
         var user = new User
         {
-            id_User = _context.NextUserId(),
             Name = regUser.Name,
             Email = regUser.Email,
             Password = PasswordHasher.HashPassword(regUser.Password),
@@ -52,6 +51,7 @@ public class UserServices : IUserServices
         };
 
         _context.Users.Add(user);
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(new
         {
@@ -62,7 +62,7 @@ public class UserServices : IUserServices
 
     public Task<IActionResult> Authorize(Auth authUser)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Email.Equals(authUser.Email, StringComparison.OrdinalIgnoreCase));
+        var user = _context.Users.FirstOrDefault(x => x.Email.ToLower() == authUser.Email.ToLower());
 
         if (user is null || !PasswordHasher.Verify(authUser.Password, user.Password))
         {
@@ -73,15 +73,16 @@ public class UserServices : IUserServices
             }));
         }
 
-        _context.Sessions.RemoveAll(x => x.User_Id == user.id_User);
+        _context.Sessions.RemoveRange(_context.Sessions.Where(x => x.User_Id == user.id_User));
 
         var token = _jwtGenerator.GenerateToken(user);
         _context.Sessions.Add(new Session
         {
-            id_Session = _context.NextSessionId(),
             Token = token,
-            User_Id = user.id_User
+            User_Id = user.id_User,
+            CreatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified)
         });
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(new
         {
@@ -104,6 +105,7 @@ public class UserServices : IUserServices
         }
 
         _context.Sessions.Remove(session);
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(new
         {
@@ -147,7 +149,7 @@ public class UserServices : IUserServices
         }
 
         var existingEmail = _context.Users.FirstOrDefault(x =>
-            x.Email.Equals(profile.Email, StringComparison.OrdinalIgnoreCase) && x.id_User != user.id_User);
+            x.Email.ToLower() == profile.Email.ToLower() && x.id_User != user.id_User);
 
         if (existingEmail is not null)
         {
@@ -189,6 +191,8 @@ public class UserServices : IUserServices
             }
         }
 
+        _context.SaveChanges();
+
         return Task.FromResult<IActionResult>(new OkObjectResult(new
         {
             status = true,
@@ -200,6 +204,7 @@ public class UserServices : IUserServices
     {
         var users = _context.Users
             .OrderBy(x => x.Name)
+            .ToList()
             .Select(BuildUserResult)
             .ToList();
 
@@ -212,7 +217,7 @@ public class UserServices : IUserServices
 
     public Task<IActionResult> CreateNewUser(CreateNewUser regUser)
     {
-        if (_context.Users.Any(x => x.Email.Equals(regUser.Email, StringComparison.OrdinalIgnoreCase)))
+        if (_context.Users.Any(x => x.Email.ToLower() == regUser.Email.ToLower()))
         {
             return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
             {
@@ -228,11 +233,11 @@ public class UserServices : IUserServices
         {
             var client = new Client
             {
-                Id = _context.NextClientId(),
                 FullName = regUser.Name,
                 Phone = regUser.Phone ?? string.Empty
             };
             _context.Clients.Add(client);
+            _context.SaveChanges();
             clientId = client.Id;
         }
 
@@ -240,17 +245,16 @@ public class UserServices : IUserServices
         {
             var trainer = new Trainer
             {
-                Id = _context.NextTrainerId(),
                 FullName = regUser.Name,
                 Specialization = regUser.Specialization ?? "Общая подготовка"
             };
             _context.Trainers.Add(trainer);
+            _context.SaveChanges();
             trainerId = trainer.Id;
         }
 
         var user = new User
         {
-            id_User = _context.NextUserId(),
             Name = regUser.Name,
             Email = regUser.Email,
             Password = PasswordHasher.HashPassword(regUser.Password),
@@ -261,6 +265,7 @@ public class UserServices : IUserServices
         };
 
         _context.Users.Add(user);
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(new
         {

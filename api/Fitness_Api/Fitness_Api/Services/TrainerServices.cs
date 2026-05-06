@@ -7,10 +7,10 @@ namespace Fitness_Api.Services;
 
 public class TrainerServices : ITrainerServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
 
-    public TrainerServices(InMemoryStore context, SessionResolver sessionResolver)
+    public TrainerServices(FitnessDbContext context, SessionResolver sessionResolver)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -18,7 +18,7 @@ public class TrainerServices : ITrainerServices
 
     public Task<IActionResult> GetAllTrainers()
     {
-        return Task.FromResult<IActionResult>(new OkObjectResult(_context.Trainers.OrderBy(x => x.FullName)));
+        return Task.FromResult<IActionResult>(new OkObjectResult(_context.Trainers.OrderBy(x => x.FullName).ToList()));
     }
 
     public Task<IActionResult> GetMyTrainer(string token)

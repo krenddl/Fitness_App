@@ -11,11 +11,11 @@ namespace Fitness_Api.Services;
 
 public class CommunicationServices : ICommunicationServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
     private readonly IHubContext<NotificationHub> _hub;
 
-    public CommunicationServices(InMemoryStore context, SessionResolver sessionResolver, IHubContext<NotificationHub> hub)
+    public CommunicationServices(FitnessDbContext context, SessionResolver sessionResolver, IHubContext<NotificationHub> hub)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -32,9 +32,9 @@ public class CommunicationServices : ICommunicationServices
 
         var chat = user.Role_Id switch
         {
-            RoleIds.Administrator => _context.Chat.OrderBy(x => x.SentAt).ToList(),
-            RoleIds.Trainer when user.Trainer_Id.HasValue => _context.Chat.Where(x => x.TrainerId == user.Trainer_Id.Value).OrderBy(x => x.SentAt).ToList(),
-            RoleIds.Client when user.Client_Id.HasValue => _context.Chat.Where(x => x.ClientId == user.Client_Id.Value).OrderBy(x => x.SentAt).ToList(),
+            RoleIds.Administrator => _context.ChatMessages.OrderBy(x => x.SentAt).ToList(),
+            RoleIds.Trainer when user.Trainer_Id.HasValue => _context.ChatMessages.Where(x => x.TrainerId == user.Trainer_Id.Value).OrderBy(x => x.SentAt).ToList(),
+            RoleIds.Client when user.Client_Id.HasValue => _context.ChatMessages.Where(x => x.ClientId == user.Client_Id.Value).OrderBy(x => x.SentAt).ToList(),
             _ => new List<ChatMessage>()
         };
 
@@ -75,7 +75,6 @@ public class CommunicationServices : ICommunicationServices
 
         var message = new ChatMessage
         {
-            Id = _context.NextChatId(),
             TrainerId = trainerId,
             ClientId = clientId,
             SenderRole = senderRole,
@@ -83,7 +82,8 @@ public class CommunicationServices : ICommunicationServices
             SentAt = DateTime.UtcNow
         };
 
-        _context.Chat.Add(message);
+        _context.ChatMessages.Add(message);
+        _context.SaveChanges();
         await _hub.Clients.All.SendAsync("ChatMessage", message);
 
         return new OkObjectResult(message);
@@ -108,13 +108,13 @@ public class CommunicationServices : ICommunicationServices
     {
         var push = new PushNotification
         {
-            Id = _context.NextNotificationId(),
             ClientId = request.ClientId,
             Text = request.Text,
             SentAt = DateTime.UtcNow
         };
 
         _context.Notifications.Add(push);
+        _context.SaveChanges();
         await _hub.Clients.All.SendAsync("PushNotification", push);
 
         return new OkObjectResult(push);

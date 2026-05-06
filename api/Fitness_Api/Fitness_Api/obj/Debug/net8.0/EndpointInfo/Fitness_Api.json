@@ -15,30 +15,13 @@
             "description": "OK"
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/api/Clients/Me": {
+      "get": {
         "tags": [
           "Clients"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Client"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Client"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Client"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -65,17 +48,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChatMessage"
+                "$ref": "#/components/schemas/SendChatRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChatMessage"
+                "$ref": "#/components/schemas/SendChatRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ChatMessage"
+                "$ref": "#/components/schemas/SendChatRequest"
               }
             }
           }
@@ -106,17 +89,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PushNotification"
+                "$ref": "#/components/schemas/SendPushRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/PushNotification"
+                "$ref": "#/components/schemas/SendPushRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/PushNotification"
+                "$ref": "#/components/schemas/SendPushRequest"
               }
             }
           }
@@ -277,7 +260,7 @@
         }
       }
     },
-    "/api/Plans/{id}/progress/{percent}": {
+    "/api/Plans/{id}/progress/{progress}": {
       "post": {
         "tags": [
           "Plans"
@@ -293,7 +276,7 @@
             }
           },
           {
-            "name": "percent",
+            "name": "progress",
             "in": "path",
             "required": true,
             "schema": {
@@ -331,30 +314,185 @@
             "description": "OK"
           }
         }
-      },
-      "post": {
+      }
+    },
+    "/api/Trainers/Me": {
+      "get": {
         "tags": [
           "Trainers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/Registration": {
+      "post": {
+        "tags": [
+          "User"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Trainer"
+                "$ref": "#/components/schemas/Registration"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Trainer"
+                "$ref": "#/components/schemas/Registration"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Trainer"
+                "$ref": "#/components/schemas/Registration"
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/Authorize": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Auth"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Auth"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Auth"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/Logout": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/Session": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/Profile": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/GetAllUsers": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/CreateNewUser": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewUser"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewUser"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNewUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/User/DemoAccounts": {
+      "get": {
+        "tags": [
+          "User"
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -383,17 +521,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Visit"
+                "$ref": "#/components/schemas/EnterVisitRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Visit"
+                "$ref": "#/components/schemas/EnterVisitRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Visit"
+                "$ref": "#/components/schemas/EnterVisitRequest"
               }
             }
           }
@@ -405,14 +543,14 @@
         }
       }
     },
-    "/api/Visits/exit/{visitId}": {
+    "/api/Visits/exit/{id}": {
       "post": {
         "tags": [
           "Visits"
         ],
         "parameters": [
           {
-            "name": "visitId",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -469,7 +607,7 @@
         }
       }
     },
-    "/api/Workouts/{id}/enroll/{clientId}": {
+    "/api/Workouts/{id}/enroll": {
       "post": {
         "tags": [
           "Workouts"
@@ -483,17 +621,27 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "clientId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollWorkout"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollWorkout"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollWorkout"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -504,48 +652,84 @@
   },
   "components": {
     "schemas": {
-      "ChatMessage": {
+      "Auth": {
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "trainerId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "clientId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "senderRole": {
+          "email": {
+            "minLength": 1,
             "type": "string",
-            "nullable": true
+            "format": "email"
           },
-          "text": {
-            "type": "string",
-            "nullable": true
-          },
-          "sentAt": {
-            "type": "string",
-            "format": "date-time"
+          "password": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "Client": {
+      "CreateNewUser": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "role_Id"
+        ],
         "type": "object",
         "properties": {
-          "id": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 6,
+            "type": "string"
+          },
+          "role_Id": {
             "type": "integer",
             "format": "int32"
           },
-          "fullName": {
+          "description": {
             "type": "string",
             "nullable": true
           },
           "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialization": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EnrollWorkout": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EnterVisitRequest": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accessType": {
             "type": "string",
             "nullable": true
           }
@@ -586,12 +770,11 @@
       },
       "MembershipStatus": {
         "enum": [
-          0,
-          1,
-          2
+          "Active",
+          "Frozen",
+          "Expired"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "PersonalPlan": {
         "type": "object",
@@ -623,10 +806,74 @@
         },
         "additionalProperties": false
       },
-      "PushNotification": {
+      "Profile": {
+        "required": [
+          "email",
+          "name"
+        ],
         "type": "object",
         "properties": {
-          "id": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Registration": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "phone"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 2,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 6,
+            "type": "string"
+          },
+          "phone": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendChatRequest": {
+        "type": "object",
+        "properties": {
+          "trainerId": {
             "type": "integer",
             "format": "int32"
           },
@@ -637,53 +884,18 @@
           "text": {
             "type": "string",
             "nullable": true
-          },
-          "sentAt": {
-            "type": "string",
-            "format": "date-time"
           }
         },
         "additionalProperties": false
       },
-      "Trainer": {
+      "SendPushRequest": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "fullName": {
-            "type": "string",
-            "nullable": true
-          },
-          "specialization": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "Visit": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
           "clientId": {
             "type": "integer",
             "format": "int32"
           },
-          "enteredAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "exitedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "accessType": {
+          "text": {
             "type": "string",
             "nullable": true
           }

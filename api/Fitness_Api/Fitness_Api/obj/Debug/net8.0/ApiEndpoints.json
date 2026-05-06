@@ -11,18 +11,12 @@
   },
   {
     "ContainingType": "Fitness_Api.Controllers.ClientsController",
-    "Method": "Create",
-    "RelativePath": "api/Clients",
-    "HttpMethod": "POST",
+    "Method": "Me",
+    "RelativePath": "api/Clients/Me",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [
-      {
-        "Name": "model",
-        "Type": "Fitness_Api.Models.Client",
-        "IsRequired": true
-      }
-    ],
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -44,8 +38,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
-        "Type": "Fitness_Api.Models.ChatMessage",
+        "Name": "request",
+        "Type": "Fitness_Api.Requests.SendChatRequest",
         "IsRequired": true
       }
     ],
@@ -70,8 +64,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
-        "Type": "Fitness_Api.Models.PushNotification",
+        "Name": "request",
+        "Type": "Fitness_Api.Requests.SendPushRequest",
         "IsRequired": true
       }
     ],
@@ -96,7 +90,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
+        "Name": "membership",
         "Type": "Fitness_Api.Models.Membership",
         "IsRequired": true
       }
@@ -169,7 +163,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
+        "Name": "plan",
         "Type": "Fitness_Api.Models.PersonalPlan",
         "IsRequired": true
       }
@@ -179,7 +173,7 @@
   {
     "ContainingType": "Fitness_Api.Controllers.PlansController",
     "Method": "UpdateProgress",
-    "RelativePath": "api/Plans/{id}/progress/{percent}",
+    "RelativePath": "api/Plans/{id}/progress/{progress}",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -190,7 +184,7 @@
         "IsRequired": true
       },
       {
-        "Name": "percent",
+        "Name": "progress",
         "Type": "System.Int32",
         "IsRequired": true
       }
@@ -219,18 +213,116 @@
   },
   {
     "ContainingType": "Fitness_Api.Controllers.TrainersController",
-    "Method": "Create",
-    "RelativePath": "api/Trainers",
+    "Method": "Me",
+    "RelativePath": "api/Trainers/Me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "Authorize",
+    "RelativePath": "api/User/Authorize",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
-        "Type": "Fitness_Api.Models.Trainer",
+        "Name": "auth",
+        "Type": "Fitness_Api.Requests.Auth",
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "CreateNewUser",
+    "RelativePath": "api/User/CreateNewUser",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createNewUser",
+        "Type": "Fitness_Api.Requests.CreateNewUser",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "DemoAccounts",
+    "RelativePath": "api/User/DemoAccounts",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/User/GetAllUsers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "Logout",
+    "RelativePath": "api/User/Logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "Profile",
+    "RelativePath": "api/User/Profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "profile",
+        "Type": "Fitness_Api.Requests.Profile",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "Registration",
+    "RelativePath": "api/User/Registration",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "regUser",
+        "Type": "Fitness_Api.Requests.Registration",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.UserController",
+    "Method": "Session",
+    "RelativePath": "api/User/Session",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -252,8 +344,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
-        "Type": "Fitness_Api.Models.Visit",
+        "Name": "request",
+        "Type": "Fitness_Api.Requests.EnterVisitRequest",
         "IsRequired": true
       }
     ],
@@ -262,13 +354,13 @@
   {
     "ContainingType": "Fitness_Api.Controllers.VisitsController",
     "Method": "Exit",
-    "RelativePath": "api/Visits/exit/{visitId}",
+    "RelativePath": "api/Visits/exit/{id}",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "visitId",
+        "Name": "id",
         "Type": "System.Int32",
         "IsRequired": true
       }
@@ -294,7 +386,7 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "model",
+        "Name": "workout",
         "Type": "Fitness_Api.Models.WorkoutSession",
         "IsRequired": true
       }
@@ -304,7 +396,7 @@
   {
     "ContainingType": "Fitness_Api.Controllers.WorkoutsController",
     "Method": "Enroll",
-    "RelativePath": "api/Workouts/{id}/enroll/{clientId}",
+    "RelativePath": "api/Workouts/{id}/enroll",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -315,8 +407,8 @@
         "IsRequired": true
       },
       {
-        "Name": "clientId",
-        "Type": "System.Int32",
+        "Name": "request",
+        "Type": "Fitness_Api.Requests.EnrollWorkout",
         "IsRequired": true
       }
     ],

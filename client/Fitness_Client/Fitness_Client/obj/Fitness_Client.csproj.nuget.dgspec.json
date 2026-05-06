@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\python_pro\\Desktop\\uchebka\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj": {}
+    "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj": {}
   },
   "projects": {
-    "C:\\Users\\python_pro\\Desktop\\uchebka\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj": {
+    "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\python_pro\\Desktop\\uchebka\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj",
+        "projectUniqueName": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj",
         "projectName": "Fitness_Client",
-        "projectPath": "C:\\Users\\python_pro\\Desktop\\uchebka\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj",
-        "packagesPath": "C:\\Users\\python_pro\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\python_pro\\Desktop\\uchebka\\client\\Fitness_Client\\Fitness_Client\\obj\\",
+        "projectPath": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\Fitness_Client.csproj",
+        "packagesPath": "C:\\Users\\uryuqq\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\python_pro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\uryuqq\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,11 +26,11 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -44,11 +44,11 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.AspNetCore.Components.Authorization": {
@@ -71,13 +71,13 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.25, )",
+              "version": "[8.0.2, )",
               "autoReferenced": true
             },
             "Microsoft.NET.Sdk.WebAssembly.Pack": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.14, )",
+              "version": "[8.0.2, )",
               "autoReferenced": true
             }
           },
@@ -95,7 +95,7 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-              "version": "[8.0.25, 8.0.25]"
+              "version": "[8.0.2, 8.0.2]"
             }
           ],
           "frameworkReferences": {
@@ -103,7 +103,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

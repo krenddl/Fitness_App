@@ -13,45 +13,43 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = Fitness_Client
 build_property.RootNamespace = Fitness_Client
-build_property.ProjectDir = C:\Users\python_pro\Desktop\uchebka\client\Fitness_Client\Fitness_Client\
+build_property.ProjectDir = C:\Users\uryuqq\Desktop\fitness\Fitness_App\client\Fitness_Client\Fitness_Client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\python_pro\Desktop\uchebka\client\Fitness_Client\Fitness_Client
+build_property.MSBuildProjectDirectory = C:\Users\uryuqq\Desktop\fitness\Fitness_App\client\Fitness_Client\Fitness_Client
 build_property._RazorSourceGeneratorDebug = 
-build_property.EffectiveAnalysisLevelStyle = 8.0
-build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/App.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/Pages/Home.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/Pages/Login.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/Pages/Register.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/Pages/Register.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/RedirectToLogin.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/RedirectToLogin.razor]
 build_metadata.AdditionalFiles.TargetPath = UmVkaXJlY3RUb0xvZ2luLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/_Imports.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/Layout/MainLayout.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-mlo8bs51vl
 
-[C:/Users/python_pro/Desktop/uchebka/client/Fitness_Client/Fitness_Client/Layout/NavMenu.razor]
+[C:/Users/uryuqq/Desktop/fitness/Fitness_App/client/Fitness_Client/Fitness_Client/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-50dmdv0uw4

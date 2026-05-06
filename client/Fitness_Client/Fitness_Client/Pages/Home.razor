@@ -318,8 +318,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDashboard();
-        await StartHub();
+        try
+        {
+            await LoadDashboard();
+
+            if (currentUser is not null)
+            {
+                await StartHub();
+            }
+        }
+        catch
+        {
+            await RedirectToLogin();
+        }
     }
 
     private bool IsAdmin => currentUser?.Role == "Administrator";
@@ -354,8 +365,7 @@ else
 
         if (session?.Status != true || session.User is null)
         {
-            await AuthService.LogoutAsync();
-            Navigation.NavigateTo("/login", true);
+            await RedirectToLogin();
             return;
         }
 
@@ -373,40 +383,59 @@ else
 
         if (IsAdmin)
         {
-            summary = await Api.GetSummary();
-            users = (await Api.GetUsers())?.Users ?? new();
-            clients = await Api.GetClients() ?? new();
-            trainers = await Api.GetTrainers() ?? new();
-            memberships = await Api.GetMemberships() ?? new();
-            workouts = await Api.GetWorkouts() ?? new();
+            summary = await SafeLoad(() => Api.GetSummary());
+            users = (await SafeLoad(() => Api.GetUsers()))?.Users ?? new();
+            clients = await SafeLoad(() => Api.GetClients()) ?? new();
+            trainers = await SafeLoad(() => Api.GetTrainers()) ?? new();
+            memberships = await SafeLoad(() => Api.GetMemberships()) ?? new();
+            workouts = await SafeLoad(() => Api.GetWorkouts()) ?? new();
         }
 
         if (IsSales)
         {
-            summary = await Api.GetSummary();
-            clients = await Api.GetClients() ?? new();
-            memberships = await Api.GetMemberships() ?? new();
+            summary = await SafeLoad(() => Api.GetSummary());
+            clients = await SafeLoad(() => Api.GetClients()) ?? new();
+            memberships = await SafeLoad(() => Api.GetMemberships()) ?? new();
         }
 
         if (IsTrainer)
         {
-            myTrainer = await Api.GetMyTrainer();
-            workouts = await Api.GetWorkouts() ?? new();
-            plans = await Api.GetPlans() ?? new();
-            chatFeed = await Api.GetChat() ?? new();
-            pushes = await Api.GetPush() ?? new();
+            myTrainer = await SafeLoad(() => Api.GetMyTrainer());
+            workouts = await SafeLoad(() => Api.GetWorkouts()) ?? new();
+            plans = await SafeLoad(() => Api.GetPlans()) ?? new();
+            chatFeed = await SafeLoad(() => Api.GetChat()) ?? new();
+            pushes = await SafeLoad(() => Api.GetPush()) ?? new();
         }
 
         if (IsClient)
         {
-            myClient = await Api.GetMyClient();
-            memberships = await Api.GetMemberships() ?? new();
-            workouts = await Api.GetWorkouts() ?? new();
-            plans = await Api.GetPlans() ?? new();
-            visits = await Api.GetVisits() ?? new();
-            chatFeed = await Api.GetChat() ?? new();
-            pushes = await Api.GetPush() ?? new();
+            myClient = await SafeLoad(() => Api.GetMyClient());
+            memberships = await SafeLoad(() => Api.GetMemberships()) ?? new();
+            workouts = await SafeLoad(() => Api.GetWorkouts()) ?? new();
+            plans = await SafeLoad(() => Api.GetPlans()) ?? new();
+            visits = await SafeLoad(() => Api.GetVisits()) ?? new();
+            chatFeed = await SafeLoad(() => Api.GetChat()) ?? new();
+            pushes = await SafeLoad(() => Api.GetPush()) ?? new();
         }
+    }
+
+    private async Task<T?> SafeLoad<T>(Func<Task<T?>> action)
+    {
+        try
+        {
+            return await action();
+        }
+        catch
+        {
+            errorMessage = "Не удалось загрузить часть данных. Проверьте, что API запущен.";
+            return default;
+        }
+    }
+
+    private async Task RedirectToLogin()
+    {
+        await AuthService.ClearSessionAsync();
+        Navigation.NavigateTo("/login", true);
     }
 
     private async Task StartHub()

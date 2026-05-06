@@ -5,5 +5,5 @@ public class Session
     public int id_Session { get; set; }
     public string Token { get; set; } = string.Empty;
     public int User_Id { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 }

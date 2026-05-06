@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\models\\session.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\models\\session.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\data\\fitnessdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\data\\fitnessdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserServices.cs",
+              "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Services\\UserServices.cs",
+              "RelativeDocumentMoniker": "Fitness_Api\\Services\\UserServices.cs",
+              "ToolTip": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Services\\UserServices.cs",
+              "RelativeToolTip": "Fitness_Api\\Services\\UserServices.cs",
+              "ViewState": "AgIAAMMAAAAAAAAAAAAgwNcAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T16:57:47.694Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Session.cs",
+              "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Models\\Session.cs",
+              "RelativeDocumentMoniker": "Fitness_Api\\Models\\Session.cs",
+              "ToolTip": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Models\\Session.cs",
+              "RelativeToolTip": "Fitness_Api\\Models\\Session.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T16:57:33.592Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "Fitness_Api\\appsettings.Development.json",
+              "ToolTip": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\appsettings.Development.json",
+              "RelativeToolTip": "Fitness_Api\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-05-06T16:51:59.528Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FitnessDbContextFactory.cs",
+              "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Data\\FitnessDbContextFactory.cs",
+              "RelativeDocumentMoniker": "Fitness_Api\\Data\\FitnessDbContextFactory.cs",
+              "ToolTip": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Data\\FitnessDbContextFactory.cs",
+              "RelativeToolTip": "Fitness_Api\\Data\\FitnessDbContextFactory.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABYAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-06T16:29:17.989Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

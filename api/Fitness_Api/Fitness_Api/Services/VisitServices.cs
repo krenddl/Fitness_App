@@ -9,10 +9,10 @@ namespace Fitness_Api.Services;
 
 public class VisitServices : IVisitServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
 
-    public VisitServices(InMemoryStore context, SessionResolver sessionResolver)
+    public VisitServices(FitnessDbContext context, SessionResolver sessionResolver)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -57,13 +57,13 @@ public class VisitServices : IVisitServices
 
         var visit = new Visit
         {
-            Id = _context.NextVisitId(),
             ClientId = clientId,
             EnteredAt = DateTime.UtcNow,
             AccessType = request.AccessType
         };
 
         _context.Visits.Add(visit);
+        _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(visit));
     }
 
@@ -87,6 +87,7 @@ public class VisitServices : IVisitServices
         }
 
         visit.ExitedAt = DateTime.UtcNow;
+        _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(visit));
     }
 }

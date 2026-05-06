@@ -11,11 +11,11 @@ namespace Fitness_Api.Services;
 
 public class WorkoutServices : IWorkoutServices
 {
-    private readonly InMemoryStore _context;
+    private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
     private readonly IHubContext<NotificationHub> _hub;
 
-    public WorkoutServices(InMemoryStore context, SessionResolver sessionResolver, IHubContext<NotificationHub> hub)
+    public WorkoutServices(FitnessDbContext context, SessionResolver sessionResolver, IHubContext<NotificationHub> hub)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -47,13 +47,14 @@ public class WorkoutServices : IWorkoutServices
             return Task.FromResult<IActionResult>(new UnauthorizedObjectResult(new { status = false, message = "Сессия не найдена" }));
         }
 
-        workout.Id = _context.NextWorkoutId();
         if (user.Role_Id == RoleIds.Trainer && user.Trainer_Id.HasValue)
         {
             workout.TrainerId = user.Trainer_Id.Value;
         }
+
         workout.ClientIds ??= new List<int>();
         _context.Workouts.Add(workout);
+        _context.SaveChanges();
 
         return Task.FromResult<IActionResult>(new OkObjectResult(workout));
     }
@@ -84,6 +85,7 @@ public class WorkoutServices : IWorkoutServices
             return new BadRequestObjectResult(new { status = false, message = "Нет активного абонемента" });
         }
 
+        workout.ClientIds ??= new List<int>();
         if (workout.ClientIds.Contains(clientId))
         {
             return new OkObjectResult(workout);
@@ -95,6 +97,7 @@ public class WorkoutServices : IWorkoutServices
         }
 
         workout.ClientIds.Add(clientId);
+        _context.SaveChanges();
         await _hub.Clients.All.SendAsync("WorkoutChanged", new { WorkoutId = workout.Id, Occupied = workout.ClientIds.Count, workout.Capacity });
 
         return new OkObjectResult(workout);
