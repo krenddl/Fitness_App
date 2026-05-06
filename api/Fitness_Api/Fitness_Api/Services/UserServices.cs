@@ -4,6 +4,7 @@ using Fitness_Api.Models;
 using Fitness_Api.Requests;
 using Fitness_Api.UniversalMethods;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fitness_Api.Services;
 
@@ -20,15 +21,16 @@ public class UserServices : IUserServices
         _sessionResolver = sessionResolver;
     }
 
-    public Task<IActionResult> Registration(Registration regUser)
+    public async Task<IActionResult> Registration(Registration regUser)
     {
-        if (_context.Users.Any(x => x.Email.ToLower() == regUser.Email.ToLower()))
+        var existingUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == regUser.Email);
+        if (existingUser is not null)
         {
-            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            return new BadRequestObjectResult(new
             {
                 status = false,
                 message = "Пользователь с таким email уже существует"
-            }));
+            });
         }
 
         var client = new Client
@@ -37,81 +39,82 @@ public class UserServices : IUserServices
             Phone = regUser.Phone
         };
 
-        _context.Clients.Add(client);
-        _context.SaveChanges();
+        await _context.Clients.AddAsync(client);
+        await _context.SaveChangesAsync();
 
         var user = new User
         {
-            Name = regUser.Name,
             Email = regUser.Email,
             Password = PasswordHasher.HashPassword(regUser.Password),
+            Name = regUser.Name,
             Description = regUser.Description,
             Role_Id = RoleIds.Client,
             Client_Id = client.Id
         };
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(new
+        return new OkObjectResult(new
         {
             status = true,
             message = "Регистрация прошла успешно"
-        }));
+        });
     }
 
-    public Task<IActionResult> Authorize(Auth authUser)
+    public async Task<IActionResult> Authorize(Auth authUser)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Email.ToLower() == authUser.Email.ToLower());
-
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == authUser.Email);
         if (user is null || !PasswordHasher.Verify(authUser.Password, user.Password))
         {
-            return Task.FromResult<IActionResult>(new UnauthorizedObjectResult(new
+            return new UnauthorizedObjectResult(new
             {
                 status = false,
                 message = "Неверный email или пароль"
-            }));
+            });
         }
 
-        _context.Sessions.RemoveRange(_context.Sessions.Where(x => x.User_Id == user.id_User));
+        var oldSessions = await _context.Sessions.Where(x => x.User_Id == user.id_User).ToListAsync();
+        _context.Sessions.RemoveRange(oldSessions);
 
         var token = _jwtGenerator.GenerateToken(user);
-        _context.Sessions.Add(new Session
+        await _context.Sessions.AddAsync(new Session
         {
             Token = token,
             User_Id = user.id_User,
             CreatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified)
         });
-        _context.SaveChanges();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(new
+        await _context.SaveChangesAsync();
+
+        return new OkObjectResult(new
         {
             status = true,
             token,
             user = BuildUserResult(user)
-        }));
+        });
     }
 
-    public Task<IActionResult> Logout(string token)
+    public async Task<IActionResult> Logout(string token)
     {
         var session = _sessionResolver.GetSession(token);
         if (session is null)
         {
-            return Task.FromResult<IActionResult>(new UnauthorizedObjectResult(new
+            return new UnauthorizedObjectResult(new
             {
                 status = false,
                 message = "Сессия не найдена"
-            }));
+            });
         }
 
         _context.Sessions.Remove(session);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(new
+        return new OkObjectResult(new
         {
             status = true,
             message = "Выход выполнен"
-        }));
+        });
     }
 
     public Task<IActionResult> Session(string token)
@@ -136,28 +139,26 @@ public class UserServices : IUserServices
         }));
     }
 
-    public Task<IActionResult> Profile(Profile profile, string token)
+    public async Task<IActionResult> Profile(Profile profile, string token)
     {
         var user = _sessionResolver.GetUser(token);
         if (user is null)
         {
-            return Task.FromResult<IActionResult>(new UnauthorizedObjectResult(new
+            return new UnauthorizedObjectResult(new
             {
                 status = false,
                 message = "Сессия не найдена"
-            }));
+            });
         }
 
-        var existingEmail = _context.Users.FirstOrDefault(x =>
-            x.Email.ToLower() == profile.Email.ToLower() && x.id_User != user.id_User);
-
+        var existingEmail = await _context.Users.FirstOrDefaultAsync(x => x.Email == profile.Email && x.id_User != user.id_User);
         if (existingEmail is not null)
         {
-            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            return new BadRequestObjectResult(new
             {
                 status = false,
                 message = "Этот email уже занят"
-            }));
+            });
         }
 
         user.Name = profile.Name;
@@ -171,7 +172,7 @@ public class UserServices : IUserServices
 
         if (user.Client_Id.HasValue)
         {
-            var client = _context.Clients.FirstOrDefault(x => x.Id == user.Client_Id.Value);
+            var client = await _context.Clients.FirstOrDefaultAsync(x => x.Id == user.Client_Id.Value);
             if (client is not null)
             {
                 client.FullName = profile.Name;
@@ -184,46 +185,56 @@ public class UserServices : IUserServices
 
         if (user.Trainer_Id.HasValue)
         {
-            var trainer = _context.Trainers.FirstOrDefault(x => x.Id == user.Trainer_Id.Value);
+            var trainer = await _context.Trainers.FirstOrDefaultAsync(x => x.Id == user.Trainer_Id.Value);
             if (trainer is not null)
             {
                 trainer.FullName = profile.Name;
             }
         }
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(new
+        return new OkObjectResult(new
         {
             status = true,
             user = BuildUserResult(user)
-        }));
+        });
     }
 
-    public Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers()
     {
-        var users = _context.Users
+        var users = await _context.Users
             .OrderBy(x => x.Name)
-            .ToList()
-            .Select(BuildUserResult)
-            .ToList();
+            .Select(user => new
+            {
+                user.id_User,
+                user.Name,
+                user.Email,
+                user.Description,
+                user.Role_Id,
+                Role = _context.Roles.FirstOrDefault(role => role.id_Role == user.Role_Id)!.Name,
+                user.Client_Id,
+                user.Trainer_Id
+            })
+            .ToListAsync();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(new
+        return new OkObjectResult(new
         {
             status = true,
             users
-        }));
+        });
     }
 
-    public Task<IActionResult> CreateNewUser(CreateNewUser regUser)
+    public async Task<IActionResult> CreateNewUser(CreateNewUser regUser)
     {
-        if (_context.Users.Any(x => x.Email.ToLower() == regUser.Email.ToLower()))
+        var existingUser = await _context.Users.FirstOrDefaultAsync(x => x.Email == regUser.Email);
+        if (existingUser is not null)
         {
-            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            return new BadRequestObjectResult(new
             {
                 status = false,
                 message = "Пользователь с таким email уже существует"
-            }));
+            });
         }
 
         int? clientId = null;
@@ -236,8 +247,9 @@ public class UserServices : IUserServices
                 FullName = regUser.Name,
                 Phone = regUser.Phone ?? string.Empty
             };
-            _context.Clients.Add(client);
-            _context.SaveChanges();
+
+            await _context.Clients.AddAsync(client);
+            await _context.SaveChangesAsync();
             clientId = client.Id;
         }
 
@@ -248,30 +260,31 @@ public class UserServices : IUserServices
                 FullName = regUser.Name,
                 Specialization = regUser.Specialization ?? "Общая подготовка"
             };
-            _context.Trainers.Add(trainer);
-            _context.SaveChanges();
+
+            await _context.Trainers.AddAsync(trainer);
+            await _context.SaveChangesAsync();
             trainerId = trainer.Id;
         }
 
         var user = new User
         {
-            Name = regUser.Name,
             Email = regUser.Email,
             Password = PasswordHasher.HashPassword(regUser.Password),
+            Name = regUser.Name,
             Description = regUser.Description,
             Role_Id = regUser.Role_Id,
             Client_Id = clientId,
             Trainer_Id = trainerId
         };
 
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(new
+        return new OkObjectResult(new
         {
             status = true,
             user = BuildUserResult(user)
-        }));
+        });
     }
 
     public Task<IActionResult> GetDemoAccounts()

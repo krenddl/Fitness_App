@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "1v+RsKDb+7p00OvmBcNR8vDgQlRKU9pRMM2vp/ZnDFA=",
+  "Hash": "09yv2SASd2pE8bKi2vhplsxbcf8z8zdfYbuf8/bzBgQ=",
   "Source": "Fitness_Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -281,25 +281,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\obj\\Debug\\net8.0\\webcil\\Microsoft.AspNetCore.Authorization.wasm"
-    },
-    {
-      "Identity": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\Microsoft.AspNetCore.Components.Authorization.wasm",
-      "SourceId": "Fitness_Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.AspNetCore.Components.Authorization.wasm",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "WasmResource",
-      "AssetTraitValue": "runtime",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\obj\\Debug\\net8.0\\webcil\\Microsoft.AspNetCore.Components.Authorization.wasm"
     },
     {
       "Identity": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\Microsoft.AspNetCore.Components.Forms.wasm",
@@ -7615,25 +7596,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\System.Xml.ReaderWriter.wasm"
-    },
-    {
-      "Identity": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\obj\\Debug\\net8.0\\compressed\\w0pm45rjcz.gz",
-      "SourceId": "Fitness_Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/Microsoft.AspNetCore.Components.Authorization.wasm.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\Microsoft.AspNetCore.Components.Authorization.wasm",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\Microsoft.AspNetCore.Components.Authorization.wasm"
     },
     {
       "Identity": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\client\\Fitness_Client\\Fitness_Client\\obj\\Debug\\net8.0\\compressed\\wcwx86iq0x.gz",

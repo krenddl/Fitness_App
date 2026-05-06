@@ -39,6 +39,13 @@ public class MembershipsController : ControllerBase
         return await _membershipServices.FreezeMembership(id);
     }
 
+    [HttpPost("{id:int}/unfreeze")]
+    [RoleAuthorize([RoleIds.Administrator, RoleIds.SalesManager])]
+    public async Task<IActionResult> Unfreeze(int id)
+    {
+        return await _membershipServices.UnfreezeMembership(id);
+    }
+
     [HttpPost("{id:int}/extend/{days:int}")]
     [RoleAuthorize([RoleIds.Administrator, RoleIds.SalesManager])]
     public async Task<IActionResult> Extend(int id, int days)

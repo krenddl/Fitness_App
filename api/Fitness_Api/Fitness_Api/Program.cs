@@ -8,9 +8,6 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -20,10 +17,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.SetIsOriginAllowed(_ => true)
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials());
+              .AllowAnyMethod());
 });
 
 builder.Services.AddSignalR(options =>
@@ -33,7 +29,7 @@ builder.Services.AddSignalR(options =>
 });
 
 builder.Services.AddDbContext<FitnessDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("FitnessDbString")));
 
 builder.Services.AddSingleton<JwtGenerator>();
 builder.Services.AddScoped<SessionResolver>();
@@ -47,15 +43,9 @@ builder.Services.AddScoped<IPlanServices, PlanServices>();
 builder.Services.AddScoped<IVisitServices, VisitServices>();
 builder.Services.AddScoped<ICommunicationServices, CommunicationServices>();
 builder.Services.AddScoped<IReportServices, ReportServices>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<FitnessDbContext>();
-    context.Database.Migrate();
-    DbInitializer.Seed(context);
-}
 
 app.UseCors();
 
@@ -69,5 +59,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();

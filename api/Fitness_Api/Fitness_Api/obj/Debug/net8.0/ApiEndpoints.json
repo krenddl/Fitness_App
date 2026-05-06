@@ -136,6 +136,22 @@
   },
   {
     "ContainingType": "Fitness_Api.Controllers.MembershipsController",
+    "Method": "Unfreeze",
+    "RelativePath": "api/Memberships/{id}/unfreeze",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.MembershipsController",
     "Method": "Reminders",
     "RelativePath": "api/Memberships/reminders",
     "HttpMethod": "GET",

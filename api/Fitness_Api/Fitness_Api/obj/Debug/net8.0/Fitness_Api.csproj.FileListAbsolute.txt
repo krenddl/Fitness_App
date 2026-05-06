@@ -147,3 +147,9 @@ C:\Users\uryuqq\Desktop\fitness\Fitness_App\api\Fitness_Api\Fitness_Api\bin\Debu
 C:\Users\uryuqq\Desktop\fitness\Fitness_App\api\Fitness_Api\Fitness_Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\uryuqq\Desktop\fitness\Fitness_App\api\Fitness_Api\Fitness_Api\bin\Debug\net8.0\Npgsql.dll
 C:\Users\uryuqq\Desktop\fitness\Fitness_App\api\Fitness_Api\Fitness_Api\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\uryuqq\Desktop\fitness\Fitness_App\artifacts\api-build-check\appsettings.Development.json
+C:\Users\uryuqq\Desktop\fitness\Fitness_App\artifacts\api-build-check\appsettings.json
+C:\Users\uryuqq\Desktop\fitness\Fitness_App\artifacts\api-build-check\Fitness_Api.deps.json
+C:\Users\uryuqq\Desktop\fitness\Fitness_App\artifacts\api-build-check\Fitness_Api.runtimeconfig.json
+C:\Users\uryuqq\Desktop\fitness\Fitness_App\artifacts\api-build-check\Fitness_Api.dll
+C:\Users\uryuqq\Desktop\fitness\Fitness_App\artifacts\api-build-check\Fitness_Api.pdb

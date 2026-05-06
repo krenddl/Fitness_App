@@ -13,13 +13,16 @@ public class CommunicationServices : ICommunicationServices
 {
     private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
-    private readonly IHubContext<NotificationHub> _hub;
+    private readonly IHubContext<ChatHub> _chatHub;
 
-    public CommunicationServices(FitnessDbContext context, SessionResolver sessionResolver, IHubContext<NotificationHub> hub)
+    public CommunicationServices(
+        FitnessDbContext context,
+        SessionResolver sessionResolver,
+        IHubContext<ChatHub> chatHub)
     {
         _context = context;
         _sessionResolver = sessionResolver;
-        _hub = hub;
+        _chatHub = chatHub;
     }
 
     public Task<IActionResult> GetChat(string token)
@@ -64,7 +67,9 @@ public class CommunicationServices : ICommunicationServices
             senderRole = "Client";
             if (trainerId == 0)
             {
-                trainerId = _context.Plans.FirstOrDefault(x => x.ClientId == clientId)?.TrainerId ?? 0;
+                trainerId = _context.Plans.FirstOrDefault(x => x.ClientId == clientId)?.TrainerId
+                    ?? _context.Trainers.OrderBy(x => x.Id).FirstOrDefault()?.Id
+                    ?? 0;
             }
         }
 
@@ -79,12 +84,12 @@ public class CommunicationServices : ICommunicationServices
             ClientId = clientId,
             SenderRole = senderRole,
             Text = request.Text,
-            SentAt = DateTime.UtcNow
+            SentAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
         };
 
         _context.ChatMessages.Add(message);
         _context.SaveChanges();
-        await _hub.Clients.All.SendAsync("ChatMessage", message);
+        await _chatHub.Clients.All.SendAsync("ReceiveChatMessage", message);
 
         return new OkObjectResult(message);
     }
@@ -110,12 +115,12 @@ public class CommunicationServices : ICommunicationServices
         {
             ClientId = request.ClientId,
             Text = request.Text,
-            SentAt = DateTime.UtcNow
+            SentAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
         };
 
         _context.Notifications.Add(push);
         _context.SaveChanges();
-        await _hub.Clients.All.SendAsync("PushNotification", push);
+        await _chatHub.Clients.All.SendAsync("PushNotification", push);
 
         return new OkObjectResult(push);
     }

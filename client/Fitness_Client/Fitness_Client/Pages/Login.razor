@@ -7,36 +7,43 @@
 
 <div class="auth-shell">
     <div class="auth-card">
-        <p class="eyebrow">PulseBoard Secure Access</p>
+        <p class="eyebrow">PulseBoard</p>
         <h1 class="hero">Вход в систему</h1>
-        <p class="subtitle">JWT-сессия сохраняется в браузере, а доступ к функциям зависит от роли пользователя.</p>
+        <p class="subtitle">Выберите демо-аккаунт или введите email и пароль вручную.</p>
 
         @if (!string.IsNullOrWhiteSpace(errorMessage))
         {
             <div class="alert-strip">@errorMessage</div>
         }
 
+        @if (isAuthorized)
+        {
+            <div class="alert-strip success">Вы уже вошли в систему. Чтобы войти под другим аккаунтом, сначала нажмите «Выход» в меню.</div>
+        }
+
         <EditForm Model="@login" OnValidSubmit="HandleLogin">
             <div class="auth-grid">
-                <InputText class="auth-input" @bind-Value="login.Email" placeholder="Email" />
-                <InputText class="auth-input" @bind-Value="login.Password" placeholder="Пароль" type="password" />
+                <InputText class="auth-input" @bind-Value="login.Email" placeholder="Email" disabled="@(isAuthorized || isBusy)" />
+                <InputText class="auth-input" @bind-Value="login.Password" placeholder="Пароль" type="password" disabled="@(isAuthorized || isBusy)" />
             </div>
-            <button class="btn-main auth-button" type="submit">Войти</button>
+            <button class="btn-main auth-button" type="submit" disabled="@(isAuthorized || isBusy)">
+                @(isAuthorized ? "Вы уже вошли" : isBusy ? "Вход..." : "Войти")
+            </button>
         </EditForm>
 
         <div class="demo-wrap">
             <p class="section-kicker">Демо-аккаунты</p>
             @foreach (var account in demoAccounts)
             {
-                <button class="demo-card" @onclick="() => UseDemo(account)">
-                    <strong>@account.Role</strong>
+                <button class="demo-card" disabled="@(isAuthorized || isBusy)" @onclick="() => UseDemo(account)">
+                    <strong>@RoleName(account.Role)</strong>
                     <span>@account.Email</span>
                     <small>@account.Password</small>
                 </button>
             }
         </div>
 
-        <p class="switch-text">Нет аккаунта? <NavLink href="register">Регистрация</NavLink></p>
+        <p class="switch-text">Нет аккаунта? <NavLink href="register">Регистрация клиента</NavLink></p>
     </div>
 </div>
 
@@ -44,27 +51,44 @@
     private LoginRequestModel login = new();
     private List<DemoAccountModel> demoAccounts = new();
     private string errorMessage = string.Empty;
+    private bool isAuthorized;
+    private bool isBusy;
 
     protected override async Task OnInitializedAsync()
     {
         var session = await AuthService.GetStoredSessionAsync();
         if (!string.IsNullOrWhiteSpace(session?.Token))
         {
-            Navigation.NavigateTo("/", true);
+            isAuthorized = true;
             return;
         }
 
-        var demo = await Api.GetDemoAccounts();
-        demoAccounts = demo?.Accounts ?? new();
+        try
+        {
+            var demo = await Api.GetDemoAccounts();
+            demoAccounts = demo?.Accounts ?? new();
+        }
+        catch
+        {
+            errorMessage = "Не удалось загрузить демо-аккаунты. Проверьте запуск API.";
+        }
     }
 
     private async Task HandleLogin()
     {
+        if (isAuthorized || isBusy)
+        {
+            return;
+        }
+
         errorMessage = string.Empty;
+        isBusy = true;
         var result = await AuthService.LoginAsync(login);
+        isBusy = false;
 
         if (result is not null && result.Status && !string.IsNullOrWhiteSpace(result.Token))
         {
+            isAuthorized = true;
             Navigation.NavigateTo("/", true);
             return;
         }
@@ -74,7 +98,24 @@
 
     private void UseDemo(DemoAccountModel account)
     {
+        if (isAuthorized || isBusy)
+        {
+            return;
+        }
+
         login.Email = account.Email;
         login.Password = account.Password;
+    }
+
+    private string RoleName(string role)
+    {
+        return role switch
+        {
+            "Administrator" => "Администратор",
+            "SalesManager" => "Менеджер продаж",
+            "Trainer" => "Тренер",
+            "Client" => "Клиент",
+            _ => role
+        };
     }
 }

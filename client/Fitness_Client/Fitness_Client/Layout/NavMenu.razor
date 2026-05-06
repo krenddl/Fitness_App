@@ -10,36 +10,47 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Панель</NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <button class="nav-link nav-button" @onclick="Logout">Выход</button>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="login">Вход</NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="register">Регистрация</NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
+        @if (isAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Панель</NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <button class="nav-link nav-button" @onclick="Logout">Выход</button>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="login">Вход</NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="register">Регистрация</NavLink>
+            </div>
+        }
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
+    private bool isAuthenticated;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthService.GetStoredSessionAsync();
+        isAuthenticated = !string.IsNullOrWhiteSpace(session?.Token);
+    }
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
 
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
+        isAuthenticated = false;
         Navigation.NavigateTo("/login", true);
     }
 }

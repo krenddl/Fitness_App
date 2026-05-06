@@ -13,9 +13,9 @@ public class WorkoutServices : IWorkoutServices
 {
     private readonly FitnessDbContext _context;
     private readonly SessionResolver _sessionResolver;
-    private readonly IHubContext<NotificationHub> _hub;
+    private readonly IHubContext<ChatHub> _hub;
 
-    public WorkoutServices(FitnessDbContext context, SessionResolver sessionResolver, IHubContext<NotificationHub> hub)
+    public WorkoutServices(FitnessDbContext context, SessionResolver sessionResolver, IHubContext<ChatHub> hub)
     {
         _context = context;
         _sessionResolver = sessionResolver;
@@ -75,10 +75,11 @@ public class WorkoutServices : IWorkoutServices
             return new NotFoundObjectResult(new { status = false, message = "Занятие не найдено" });
         }
 
+        var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
         var hasMembership = _context.Memberships.Any(x =>
             x.ClientId == clientId &&
             x.Status == MembershipStatus.Active &&
-            x.EndDate >= DateTime.UtcNow);
+            x.EndDate >= now);
 
         if (!hasMembership)
         {

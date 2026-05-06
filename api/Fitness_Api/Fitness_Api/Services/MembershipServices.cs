@@ -37,7 +37,8 @@ public class MembershipServices : IMembershipServices
 
     public Task<IActionResult> CreateMembership(Membership membership)
     {
-        membership.Status = membership.EndDate < DateTime.UtcNow ? MembershipStatus.Expired : MembershipStatus.Active;
+        var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+        membership.Status = membership.EndDate < now ? MembershipStatus.Expired : MembershipStatus.Active;
         _context.Memberships.Add(membership);
         _context.SaveChanges();
 
@@ -57,6 +58,22 @@ public class MembershipServices : IMembershipServices
         return Task.FromResult<IActionResult>(new OkObjectResult(membership));
     }
 
+    public Task<IActionResult> UnfreezeMembership(int id)
+    {
+        var membership = _context.Memberships.FirstOrDefault(x => x.Id == id);
+        if (membership is null)
+        {
+            return Task.FromResult<IActionResult>(new NotFoundObjectResult(new { status = false, message = "Абонемент не найден" }));
+        }
+
+        membership.Status = membership.EndDate < DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
+            ? MembershipStatus.Expired
+            : MembershipStatus.Active;
+
+        _context.SaveChanges();
+        return Task.FromResult<IActionResult>(new OkObjectResult(membership));
+    }
+
     public Task<IActionResult> ExtendMembership(int id, int days)
     {
         var membership = _context.Memberships.FirstOrDefault(x => x.Id == id);
@@ -66,7 +83,13 @@ public class MembershipServices : IMembershipServices
         }
 
         membership.EndDate = membership.EndDate.AddDays(days);
-        membership.Status = MembershipStatus.Active;
+        if (membership.Status != MembershipStatus.Frozen)
+        {
+            membership.Status = membership.EndDate < DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
+                ? MembershipStatus.Expired
+                : MembershipStatus.Active;
+        }
+
         _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(membership));
     }
@@ -74,7 +97,7 @@ public class MembershipServices : IMembershipServices
     public Task<IActionResult> GetReminders()
     {
         var due = _context.Memberships
-            .Where(x => !x.ReminderSent && x.EndDate <= DateTime.UtcNow.AddDays(3))
+            .Where(x => !x.ReminderSent && x.EndDate <= DateTime.SpecifyKind(DateTime.Now.AddDays(3), DateTimeKind.Unspecified))
             .ToList();
 
         foreach (var membership in due)

@@ -22,10 +22,18 @@ public class SessionStorageService
 
     public async Task<StoredSessionModel?> GetSessionAsync()
     {
-        var json = await _jsRuntime.InvokeAsync<string?>("authStorage.get", SessionKey);
-        return string.IsNullOrWhiteSpace(json)
-            ? null
-            : JsonSerializer.Deserialize<StoredSessionModel>(json);
+        try
+        {
+            var json = await _jsRuntime.InvokeAsync<string?>("authStorage.get", SessionKey);
+            return string.IsNullOrWhiteSpace(json)
+                ? null
+                : JsonSerializer.Deserialize<StoredSessionModel>(json);
+        }
+        catch
+        {
+            await ClearSessionAsync();
+            return null;
+        }
     }
 
     public async Task<string?> GetTokenAsync()

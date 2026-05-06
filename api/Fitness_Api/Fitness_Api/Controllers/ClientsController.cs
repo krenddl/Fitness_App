@@ -17,7 +17,7 @@ public class ClientsController : ControllerBase
     }
 
     [HttpGet]
-    [RoleAuthorize([RoleIds.Administrator, RoleIds.SalesManager])]
+    [RoleAuthorize([RoleIds.Administrator, RoleIds.Trainer, RoleIds.SalesManager])]
     public async Task<IActionResult> GetAll()
     {
         return await _clientServices.GetAllClients();

@@ -7,13 +7,15 @@ public class AuthService
 {
     private readonly HttpClient _http;
     private readonly SessionStorageService _storage;
-    private readonly CustomAuthStateProvider _authStateProvider;
 
-    public AuthService(HttpClient http, SessionStorageService storage, CustomAuthStateProvider authStateProvider)
+    public string? Token { get; private set; }
+    public UserSessionModel? CurrentUser { get; private set; }
+    public bool IsAuthenticated => !string.IsNullOrWhiteSpace(Token);
+
+    public AuthService(HttpClient http, SessionStorageService storage)
     {
         _http = http;
         _storage = storage;
-        _authStateProvider = authStateProvider;
     }
 
     public async Task<AuthResponseModel?> LoginAsync(LoginRequestModel model)
@@ -33,7 +35,8 @@ public class AuthService
         };
 
         await _storage.SaveSessionAsync(stored);
-        _authStateProvider.NotifyUserAuthentication(stored);
+        Token = stored.Token;
+        CurrentUser = stored.User;
 
         return result;
     }
@@ -60,20 +63,22 @@ public class AuthService
             }
         }
 
-        _http.DefaultRequestHeaders.Remove("Authorization");
-        await _storage.ClearSessionAsync();
-        _authStateProvider.NotifyUserLogout();
+        await ClearSessionAsync();
     }
 
     public async Task ClearSessionAsync()
     {
         _http.DefaultRequestHeaders.Remove("Authorization");
         await _storage.ClearSessionAsync();
-        _authStateProvider.NotifyUserLogout();
+        Token = null;
+        CurrentUser = null;
     }
 
     public async Task<StoredSessionModel?> GetStoredSessionAsync()
     {
-        return await _storage.GetSessionAsync();
+        var session = await _storage.GetSessionAsync();
+        Token = session?.Token;
+        CurrentUser = session?.User;
+        return session;
     }
 }

@@ -6,9 +6,9 @@
 
 <div class="auth-shell">
     <div class="auth-card">
-        <p class="eyebrow">Client Registration</p>
-        <h1 class="hero">Создать аккаунт клиента</h1>
-        <p class="subtitle">Регистрация создает пользователя с ролью `Client`, а затем вы входите через JWT-авторизацию.</p>
+        <p class="eyebrow">Регистрация клиента</p>
+        <h1 class="hero">Создать аккаунт</h1>
+        <p class="subtitle">После регистрации клиент сможет войти, смотреть абонемент, занятия, план и писать тренеру.</p>
 
         @if (!string.IsNullOrWhiteSpace(statusMessage))
         {
@@ -20,14 +20,21 @@
             <div class="alert-strip">@errorMessage</div>
         }
 
+        @if (isAuthorized)
+        {
+            <div class="alert-strip success">Вы уже вошли в систему. Регистрация будет доступна после выхода из аккаунта.</div>
+        }
+
         <EditForm Model="@registration" OnValidSubmit="HandleRegister">
             <div class="auth-grid">
-                <InputText class="auth-input" @bind-Value="registration.Name" placeholder="ФИО" />
-                <InputText class="auth-input" @bind-Value="registration.Phone" placeholder="Телефон" />
-                <InputText class="auth-input" @bind-Value="registration.Email" placeholder="Email" />
-                <InputText class="auth-input" @bind-Value="registration.Password" placeholder="Пароль" type="password" />
+                <InputText class="auth-input" @bind-Value="registration.Name" placeholder="ФИО" disabled="@(isAuthorized || isBusy)" />
+                <InputText class="auth-input" @bind-Value="registration.Phone" placeholder="Телефон" disabled="@(isAuthorized || isBusy)" />
+                <InputText class="auth-input" @bind-Value="registration.Email" placeholder="Email" disabled="@(isAuthorized || isBusy)" />
+                <InputText class="auth-input" @bind-Value="registration.Password" placeholder="Пароль" type="password" disabled="@(isAuthorized || isBusy)" />
             </div>
-            <button class="btn-main auth-button" type="submit">Зарегистрироваться</button>
+            <button class="btn-main auth-button" type="submit" disabled="@(isAuthorized || isBusy)">
+                @(isAuthorized ? "Вы уже вошли" : isBusy ? "Регистрация..." : "Зарегистрироваться")
+            </button>
         </EditForm>
 
         <p class="switch-text">Уже есть аккаунт? <NavLink href="login">Вход</NavLink></p>
@@ -38,13 +45,28 @@
     private RegistrationRequestModel registration = new();
     private string statusMessage = string.Empty;
     private string errorMessage = string.Empty;
+    private bool isAuthorized;
+    private bool isBusy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = await AuthService.GetStoredSessionAsync();
+        isAuthorized = !string.IsNullOrWhiteSpace(session?.Token);
+    }
 
     private async Task HandleRegister()
     {
+        if (isAuthorized || isBusy)
+        {
+            return;
+        }
+
         errorMessage = string.Empty;
         statusMessage = string.Empty;
+        isBusy = true;
 
         var result = await AuthService.RegisterAsync(registration);
+        isBusy = false;
 
         if (result is not null && result.Status)
         {

@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\data\\fitnessdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\data\\fitnessdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -13,10 +17,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|c:\\users\\uryuqq\\desktop\\fitness\\fitness_app\\api\\fitness_api\\fitness_api\\data\\fitnessdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D3131DB0-4EF0-4ABE-BA9E-6753526F871C}|Fitness_Api\\Fitness_Api.csproj|solutionrelative:fitness_api\\data\\fitnessdbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,11 +26,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "UserServices.cs",
               "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Services\\UserServices.cs",
               "RelativeDocumentMoniker": "Fitness_Api\\Services\\UserServices.cs",
@@ -38,12 +38,11 @@
               "RelativeToolTip": "Fitness_Api\\Services\\UserServices.cs",
               "ViewState": "AgIAAMMAAAAAAAAAAAAgwNcAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T16:57:47.694Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-06T16:57:47.694Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Session.cs",
               "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Models\\Session.cs",
               "RelativeDocumentMoniker": "Fitness_Api\\Models\\Session.cs",
@@ -51,12 +50,11 @@
               "RelativeToolTip": "Fitness_Api\\Models\\Session.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-06T16:57:33.592Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-06T16:57:33.592Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "appsettings.Development.json",
               "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\appsettings.Development.json",
               "RelativeDocumentMoniker": "Fitness_Api\\appsettings.Development.json",
@@ -64,12 +62,11 @@
               "RelativeToolTip": "Fitness_Api\\appsettings.Development.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-06T16:51:59.528Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-06T16:51:59.528Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "FitnessDbContextFactory.cs",
               "DocumentMoniker": "C:\\Users\\uryuqq\\Desktop\\fitness\\Fitness_App\\api\\Fitness_Api\\Fitness_Api\\Data\\FitnessDbContextFactory.cs",
               "RelativeDocumentMoniker": "Fitness_Api\\Data\\FitnessDbContextFactory.cs",

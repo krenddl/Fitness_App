@@ -45,10 +45,22 @@ public class VisitServices : IVisitServices
         }
 
         var clientId = user.Role_Id == RoleIds.Client ? user.Client_Id ?? 0 : request.ClientId;
+        var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+
+        var activeVisit = _context.Visits.FirstOrDefault(x => x.ClientId == clientId && x.ExitedAt == null);
+        if (activeVisit is not null)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = "Вход уже отмечен. Сначала отметьте выход."
+            }));
+        }
+
         var hasMembership = _context.Memberships.Any(x =>
             x.ClientId == clientId &&
             x.Status == MembershipStatus.Active &&
-            x.EndDate >= DateTime.UtcNow);
+            x.EndDate >= now);
 
         if (!hasMembership)
         {
@@ -58,7 +70,7 @@ public class VisitServices : IVisitServices
         var visit = new Visit
         {
             ClientId = clientId,
-            EnteredAt = DateTime.UtcNow,
+            EnteredAt = now,
             AccessType = request.AccessType
         };
 
@@ -86,7 +98,7 @@ public class VisitServices : IVisitServices
             return Task.FromResult<IActionResult>(new ObjectResult(new { status = false, message = "Недостаточно прав" }) { StatusCode = 403 });
         }
 
-        visit.ExitedAt = DateTime.UtcNow;
+        visit.ExitedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
         _context.SaveChanges();
         return Task.FromResult<IActionResult>(new OkObjectResult(visit));
     }

@@ -19,7 +19,7 @@ public class FitnessDbContextFactory : IDesignTimeDbContextFactory<FitnessDbCont
             .Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<FitnessDbContext>();
-        var connection = configuration.GetConnectionString("DefaultConnection")
+        var connection = configuration.GetConnectionString("FitnessDbString")
             ?? "Host=localhost;Port=5432;Database=fitness_db;Username=postgres;Password=123";
         optionsBuilder.UseNpgsql(connection);
 

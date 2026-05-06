@@ -77,6 +77,12 @@ public class ApiService
         return await _http.PostAsync($"api/memberships/{id}/freeze", null);
     }
 
+    public async Task<HttpResponseMessage> UnfreezeMembership(int id)
+    {
+        await ApplyAuthHeaderAsync();
+        return await _http.PostAsync($"api/memberships/{id}/unfreeze", null);
+    }
+
     public async Task<HttpResponseMessage> ExtendMembership(int id, int days)
     {
         await ApplyAuthHeaderAsync();
