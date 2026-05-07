@@ -1,0 +1,368 @@
+@page "/chat"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject ApiService Api
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<PageTitle>Чат</PageTitle>
+
+@if (isLoading)
+{
+    <p class="subtitle">Загрузка чата...</p>
+}
+else if (currentUser is null)
+{
+    <div class="alert-strip">@errorMessage</div>
+}
+else
+{
+    <div class="page-header">
+        <div>
+            <h1>Чат</h1>
+            <p>@currentUser.Name, @RoleName(currentUser.Role) · @ConnectionText</p>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert-strip success">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert-strip">@errorMessage</div>
+    }
+
+    @if (!IsTrainer && !IsClient)
+    {
+        <section class="panel">
+            <p class="section-note">Чат доступен клиенту и тренеру.</p>
+        </section>
+    }
+    else
+    {
+        <div class="chat-page">
+            <section class="panel dialog-list">
+                <h2>@(IsTrainer ? "Клиенты" : "Тренеры")</h2>
+                @if (IsTrainer)
+                {
+                    @foreach (var client in clients)
+                    {
+                        <button class="dialog-item @(selectedClientId == client.Id ? "active" : "")" @onclick="() => SelectClient(client.Id)">
+                            <strong>@client.FullName</strong>
+                            <span>@client.Phone</span>
+                        </button>
+                    }
+                }
+                else
+                {
+                    @foreach (var trainer in trainers)
+                    {
+                        <button class="dialog-item @(selectedTrainerId == trainer.Id ? "active" : "")" @onclick="() => SelectTrainer(trainer.Id)">
+                            <strong>@trainer.FullName</strong>
+                            <span>@trainer.Specialization</span>
+                        </button>
+                    }
+                }
+            </section>
+
+            <section class="panel dialog-panel">
+                <h2>@DialogTitle</h2>
+                <div class="message-list">
+                    @foreach (var message in DialogMessages)
+                    {
+                        <div class="message-bubble @(IsMyMessage(message) ? "mine" : "other")">
+                            <strong>@SenderName(message.SenderRole)</strong>
+                            <span>@message.Text</span>
+                            <small>@message.SentAt.ToString("dd.MM HH:mm")</small>
+                        </div>
+                    }
+                    @if (!DialogMessages.Any())
+                    {
+                        <div class="mini-line">Сообщений пока нет.</div>
+                    }
+                </div>
+
+                <div class="chat-send">
+                    <input @bind="messageText" @bind:event="oninput" placeholder="Введите сообщение" />
+                    <button class="btn-main" disabled="@(!CanSend)" @onclick="SendMessage">Отправить</button>
+                </div>
+            </section>
+        </div>
+    }
+}
+
+@code {
+    private UserSessionModel? currentUser;
+    private List<ClientModel> clients = new();
+    private List<TrainerModel> trainers = new();
+    private List<ChatMessageModel> messages = new();
+    private HubConnection? hub;
+    private int selectedClientId;
+    private int selectedTrainerId;
+    private string messageText = string.Empty;
+    private string statusMessage = string.Empty;
+    private string errorMessage = string.Empty;
+    private bool isLoading = true;
+    private bool disposed;
+
+    private bool IsTrainer => currentUser?.Role == "Trainer";
+    private bool IsClient => currentUser?.Role == "Client";
+    private bool CanSend => !string.IsNullOrWhiteSpace(messageText)
+        && ((IsTrainer && selectedClientId > 0) || (IsClient && selectedTrainerId > 0))
+        && hub?.State == HubConnectionState.Connected;
+    private string ConnectionText => hub?.State == HubConnectionState.Connected ? "SignalR подключен" : "подключение SignalR...";
+
+    private string DialogTitle
+    {
+        get
+        {
+            if (IsTrainer)
+            {
+                return clients.FirstOrDefault(x => x.Id == selectedClientId)?.FullName ?? "Выберите клиента";
+            }
+
+            return trainers.FirstOrDefault(x => x.Id == selectedTrainerId)?.FullName ?? "Выберите тренера";
+        }
+    }
+
+    private List<ChatMessageModel> DialogMessages => messages
+        .Where(x => IsTrainer
+            ? x.TrainerId == currentUser?.Trainer_Id && x.ClientId == selectedClientId
+            : x.ClientId == currentUser?.Client_Id && x.TrainerId == selectedTrainerId)
+        .OrderBy(x => x.SentAt)
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var sessionTask = AuthService.GetStoredSessionAsync();
+            var sessionCompleted = await Task.WhenAny(sessionTask, Task.Delay(TimeSpan.FromSeconds(3)));
+            if (sessionCompleted != sessionTask)
+            {
+                errorMessage = "Не удалось прочитать сессию браузера. Войдите заново.";
+                isLoading = false;
+                return;
+            }
+
+            var session = await sessionTask;
+            if (string.IsNullOrWhiteSpace(session?.Token) || session.User is null)
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            currentUser = session.User;
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+
+            await LoadChat();
+            _ = StartHub(session.Token);
+        }
+        catch
+        {
+            errorMessage = "Не удалось загрузить чат. Проверьте запуск Fitness_Api.";
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadChat(bool silent = false)
+    {
+        if (!silent)
+        {
+            errorMessage = string.Empty;
+            statusMessage = string.Empty;
+        }
+
+        try
+        {
+            if (IsTrainer)
+            {
+                clients = await SafeLoad(() => Api.GetClients()) ?? new();
+                selectedClientId = selectedClientId == 0 ? clients.FirstOrDefault()?.Id ?? 0 : selectedClientId;
+            }
+
+            if (IsClient)
+            {
+                trainers = await SafeLoad(() => Api.GetTrainers()) ?? new();
+                selectedTrainerId = selectedTrainerId == 0 ? trainers.FirstOrDefault()?.Id ?? 0 : selectedTrainerId;
+            }
+
+            messages = await SafeLoad(() => Api.GetChat()) ?? new();
+        }
+        catch
+        {
+            if (!silent)
+            {
+                errorMessage = "Не удалось загрузить диалоги. Проверьте запуск API.";
+            }
+        }
+    }
+
+    private async Task<T?> SafeLoad<T>(Func<Task<T?>> action)
+    {
+        var loadTask = action();
+        var completedTask = await Task.WhenAny(loadTask, Task.Delay(TimeSpan.FromSeconds(6)));
+        return completedTask == loadTask ? await loadTask : default;
+    }
+
+    private async Task StartHub(string token)
+    {
+        if (hub is not null)
+        {
+            await hub.DisposeAsync();
+        }
+
+        hub = new HubConnectionBuilder()
+            .WithUrl($"http://localhost:5294/hubs/chat?access_token={Uri.EscapeDataString(token)}")
+            .WithAutomaticReconnect()
+            .Build();
+
+        hub.On<ChatMessageModel>("ReceiveChatMessage", message =>
+        {
+            if (IsVisibleForMe(message) && messages.All(x => x.Id != message.Id))
+            {
+                messages.Add(message);
+                InvokeAsync(StateHasChanged);
+            }
+        });
+
+        hub.Reconnecting += _ =>
+        {
+            statusMessage = string.Empty;
+            InvokeAsync(StateHasChanged);
+            return Task.CompletedTask;
+        };
+
+        hub.Reconnected += _ =>
+        {
+            statusMessage = string.Empty;
+            errorMessage = string.Empty;
+            InvokeAsync(StateHasChanged);
+            return Task.CompletedTask;
+        };
+
+        hub.Closed += exception =>
+        {
+            _ = InvokeAsync(async () =>
+            {
+                await Task.Delay(2000);
+                if (!disposed)
+                {
+                    await StartHub(token);
+                }
+            });
+
+            return Task.CompletedTask;
+        };
+
+        try
+        {
+            await hub.StartAsync();
+            statusMessage = string.Empty;
+            errorMessage = string.Empty;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch
+        {
+            errorMessage = "SignalR не подключился. Проверьте, что API запущен, и обновите страницу.";
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (!CanSend)
+        {
+            return;
+        }
+
+        var request = new SendChatRequestModel
+        {
+            ClientId = IsTrainer ? selectedClientId : currentUser?.Client_Id ?? 0,
+            TrainerId = IsClient ? selectedTrainerId : currentUser?.Trainer_Id ?? 0,
+            Text = messageText.Trim()
+        };
+
+        try
+        {
+            if (hub?.State == HubConnectionState.Connected)
+            {
+                await hub.InvokeAsync("SendChatMessage", request);
+            }
+            else
+            {
+                errorMessage = "SignalR не подключен. Сообщение не отправлено.";
+                return;
+            }
+
+            messageText = string.Empty;
+            statusMessage = string.Empty;
+            errorMessage = string.Empty;
+        }
+        catch
+        {
+            statusMessage = string.Empty;
+            errorMessage = "Не удалось отправить сообщение. Проверьте, что выбран правильный диалог.";
+        }
+    }
+
+    private void SelectClient(int id)
+    {
+        selectedClientId = id;
+        statusMessage = string.Empty;
+        errorMessage = string.Empty;
+    }
+
+    private void SelectTrainer(int id)
+    {
+        selectedTrainerId = id;
+        statusMessage = string.Empty;
+        errorMessage = string.Empty;
+    }
+
+    private bool IsVisibleForMe(ChatMessageModel message)
+    {
+        return IsTrainer && currentUser?.Trainer_Id == message.TrainerId
+            || IsClient && currentUser?.Client_Id == message.ClientId;
+    }
+
+    private bool IsMyMessage(ChatMessageModel message)
+    {
+        return IsTrainer && message.SenderRole == "Trainer"
+            || IsClient && message.SenderRole == "Client";
+    }
+
+    private string RoleName(string? role)
+    {
+        return role switch
+        {
+            "Trainer" => "тренер",
+            "Client" => "клиент",
+            "Administrator" => "администратор",
+            "SalesManager" => "менеджер продаж",
+            _ => role ?? string.Empty
+        };
+    }
+
+    private string SenderName(string role)
+    {
+        return role switch
+        {
+            "Trainer" => "Тренер",
+            "Client" => "Клиент",
+            _ => "Пользователь"
+        };
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        if (hub is not null)
+        {
+            await hub.DisposeAsync();
+        }
+    }
+}

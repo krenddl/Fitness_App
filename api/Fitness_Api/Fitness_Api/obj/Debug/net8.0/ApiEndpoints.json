@@ -11,6 +11,22 @@
   },
   {
     "ContainingType": "Fitness_Api.Controllers.ClientsController",
+    "Method": "Create",
+    "RelativePath": "api/Clients",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "client",
+        "Type": "Fitness_Api.Models.Client",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Fitness_Api.Controllers.ClientsController",
     "Method": "Me",
     "RelativePath": "api/Clients/Me",
     "HttpMethod": "GET",

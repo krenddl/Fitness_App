@@ -65,6 +65,23 @@
         statusMessage = string.Empty;
         isBusy = true;
 
+        if (string.IsNullOrWhiteSpace(registration.Name)
+            || string.IsNullOrWhiteSpace(registration.Phone)
+            || string.IsNullOrWhiteSpace(registration.Email)
+            || string.IsNullOrWhiteSpace(registration.Password))
+        {
+            isBusy = false;
+            errorMessage = "Заполните ФИО, телефон, email и пароль.";
+            return;
+        }
+
+        if (registration.Password.Length < 6)
+        {
+            isBusy = false;
+            errorMessage = "Пароль должен быть не короче 6 символов.";
+            return;
+        }
+
         var result = await AuthService.RegisterAsync(registration);
         isBusy = false;
 

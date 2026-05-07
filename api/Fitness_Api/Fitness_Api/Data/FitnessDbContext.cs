@@ -123,7 +123,7 @@ public class FitnessDbContext : DbContext
             new User
             {
                 id_User = 1,
-                Name = "Pulse Admin",
+                Name = "Администратор клуба",
                 Email = "admin@pulse.local",
                 Password = PasswordHasher.HashPassword("Demo123!"),
                 Description = "Администратор клуба",
@@ -132,7 +132,7 @@ public class FitnessDbContext : DbContext
             new User
             {
                 id_User = 2,
-                Name = "Sales Lead",
+                Name = "Менеджер продаж",
                 Email = "sales@pulse.local",
                 Password = PasswordHasher.HashPassword("Demo123!"),
                 Description = "Менеджер по продажам",
@@ -165,8 +165,8 @@ public class FitnessDbContext : DbContext
                 Id = 1,
                 ClientId = 1,
                 Type = "Стандарт",
-                StartDate = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc),
-                EndDate = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Unspecified),
+                EndDate = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Unspecified),
                 Status = MembershipStatus.Active
             },
             new Membership
@@ -174,8 +174,8 @@ public class FitnessDbContext : DbContext
                 Id = 2,
                 ClientId = 2,
                 Type = "Премиум",
-                StartDate = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc),
-                EndDate = new DateTime(2026, 5, 20, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Unspecified),
+                EndDate = new DateTime(2026, 5, 20, 0, 0, 0, DateTimeKind.Unspecified),
                 Status = MembershipStatus.Active
             });
 
@@ -183,18 +183,18 @@ public class FitnessDbContext : DbContext
             new WorkoutSession
             {
                 Id = 1,
-                Title = "Functional Core",
+                Title = "Функциональная тренировка",
                 TrainerId = 1,
-                StartAt = new DateTime(2026, 5, 7, 18, 0, 0, DateTimeKind.Utc),
+                StartAt = new DateTime(2026, 5, 7, 18, 0, 0, DateTimeKind.Unspecified),
                 Capacity = 15,
                 ClientIds = new List<int> { 1 }
             },
             new WorkoutSession
             {
                 Id = 2,
-                Title = "Yoga Flow",
+                Title = "Йога для начинающих",
                 TrainerId = 2,
-                StartAt = new DateTime(2026, 5, 8, 19, 0, 0, DateTimeKind.Utc),
+                StartAt = new DateTime(2026, 5, 8, 19, 0, 0, DateTimeKind.Unspecified),
                 Capacity = 12,
                 ClientIds = new List<int>()
             });
@@ -213,8 +213,8 @@ public class FitnessDbContext : DbContext
         {
             Id = 1,
             ClientId = 1,
-            EnteredAt = new DateTime(2026, 5, 6, 12, 0, 0, DateTimeKind.Utc),
-            ExitedAt = new DateTime(2026, 5, 6, 13, 30, 0, DateTimeKind.Utc),
+            EnteredAt = new DateTime(2026, 5, 6, 12, 0, 0, DateTimeKind.Unspecified),
+            ExitedAt = new DateTime(2026, 5, 6, 13, 30, 0, DateTimeKind.Unspecified),
             AccessType = "QR"
         });
 
@@ -225,7 +225,7 @@ public class FitnessDbContext : DbContext
             ClientId = 1,
             SenderRole = "Trainer",
             Text = "Не забудь про тренировку завтра",
-            SentAt = new DateTime(2026, 5, 6, 10, 0, 0, DateTimeKind.Utc)
+            SentAt = new DateTime(2026, 5, 6, 10, 0, 0, DateTimeKind.Unspecified)
         });
 
         modelBuilder.Entity<PushNotification>().HasData(new PushNotification
@@ -233,7 +233,7 @@ public class FitnessDbContext : DbContext
             Id = 1,
             ClientId = 1,
             Text = "Тренировка завтра в 18:00",
-            SentAt = new DateTime(2026, 5, 6, 11, 0, 0, DateTimeKind.Utc)
+            SentAt = new DateTime(2026, 5, 6, 11, 0, 0, DateTimeKind.Unspecified)
         });
     }
 }

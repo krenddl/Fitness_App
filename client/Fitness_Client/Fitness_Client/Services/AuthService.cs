@@ -21,7 +21,15 @@ public class AuthService
     public async Task<AuthResponseModel?> LoginAsync(LoginRequestModel model)
     {
         var response = await _http.PostAsJsonAsync("api/user/authorize", model);
-        var result = await response.Content.ReadFromJsonAsync<AuthResponseModel>();
+        AuthResponseModel? result;
+        try
+        {
+            result = await response.Content.ReadFromJsonAsync<AuthResponseModel>();
+        }
+        catch
+        {
+            return new AuthResponseModel { Status = false, Message = "Не удалось выполнить вход. Проверьте email и пароль." };
+        }
 
         if (!response.IsSuccessStatusCode || result is null || !result.Status || string.IsNullOrWhiteSpace(result.Token))
         {
@@ -44,7 +52,20 @@ public class AuthService
     public async Task<ApiStatusResponseModel?> RegisterAsync(RegistrationRequestModel model)
     {
         var response = await _http.PostAsJsonAsync("api/user/registration", model);
-        return await response.Content.ReadFromJsonAsync<ApiStatusResponseModel>();
+        try
+        {
+            var result = await response.Content.ReadFromJsonAsync<ApiStatusResponseModel>();
+            if (!response.IsSuccessStatusCode && string.IsNullOrWhiteSpace(result?.Message))
+            {
+                return new ApiStatusResponseModel { Status = false, Message = "Проверьте ФИО, телефон, email и пароль." };
+            }
+
+            return result;
+        }
+        catch
+        {
+            return new ApiStatusResponseModel { Status = false, Message = "Проверьте ФИО, телефон, email и пароль." };
+        }
     }
 
     public async Task LogoutAsync()

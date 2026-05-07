@@ -52,6 +52,29 @@ public class WorkoutServices : IWorkoutServices
             workout.TrainerId = user.Trainer_Id.Value;
         }
 
+        if (string.IsNullOrWhiteSpace(workout.Title))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Введите название занятия" }));
+        }
+
+        if (!_context.Trainers.Any(x => x.Id == workout.TrainerId))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Выберите тренера" }));
+        }
+
+        if (workout.Capacity <= 0)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Количество мест должно быть больше нуля" }));
+        }
+
+        var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+        workout.StartAt = DateTime.SpecifyKind(workout.StartAt, DateTimeKind.Unspecified);
+        if (workout.StartAt < now.AddMinutes(-5))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Дата занятия уже прошла" }));
+        }
+
+        workout.Title = workout.Title.Trim();
         workout.ClientIds ??= new List<int>();
         _context.Workouts.Add(workout);
         _context.SaveChanges();
@@ -76,10 +99,21 @@ public class WorkoutServices : IWorkoutServices
         }
 
         var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+        if (!_context.Clients.Any(x => x.Id == clientId))
+        {
+            return new BadRequestObjectResult(new { status = false, message = "Клиент не найден" });
+        }
+
+        if (workout.StartAt < now)
+        {
+            return new BadRequestObjectResult(new { status = false, message = "Занятие уже прошло" });
+        }
+
         var hasMembership = _context.Memberships.Any(x =>
             x.ClientId == clientId &&
             x.Status == MembershipStatus.Active &&
-            x.EndDate >= now);
+            x.StartDate.Date <= now.Date &&
+            x.EndDate.Date >= now.Date);
 
         if (!hasMembership)
         {

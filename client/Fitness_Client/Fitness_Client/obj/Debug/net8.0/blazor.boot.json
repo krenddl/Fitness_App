@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Fitness_Client",
   "resources": {
-    "hash": "sha256-YSoK2tMOQLqtdUbV9WISMI7OeZiSCPqMl76yYJS1NYQ=",
+    "hash": "sha256-AdfPtjLDNB4k3pq6jlnkXgPd/NMbKdYUWcobuqjOKGc=",
     "jsModuleNative": {
       "dotnet.native.8.0.2.5mjz2lh5b6.js": "sha256-gPMK16QWoJSTxorlZJqcVtbBRTniIQWlLsJN2O4cJHg="
     },
@@ -216,10 +216,10 @@
       "mscorlib.wasm": "sha256-ovgR6YJeXMcsAhvGJVdyjhD5pU34EEAc0BGQYTUAyNk=",
       "netstandard.wasm": "sha256-90+pPOP/3NxK0buBFJlcvDw0r6Nk/i3+oM9dt2x+LPM=",
       "System.Private.CoreLib.wasm": "sha256-IXKG8p3ppN4zPjJOxht5wSXCcbFNPH6InVm7fsThBPI=",
-      "Fitness_Client.wasm": "sha256-thlYEicZke0Zl3zwroXNAW2lDmpnIhNtdMT5/is/g2E="
+      "Fitness_Client.wasm": "sha256-GBlq+O3Qi9G5Q7Whfc2/8jeheMIE83aUKlgOJI94iFE="
     },
     "pdb": {
-      "Fitness_Client.pdb": "sha256-no7rt+UxIYdrXr/6ESXFKNpCC6WpN42wIwM2vpNhQSQ="
+      "Fitness_Client.pdb": "sha256-CqPyytA2hZ7gh1Uer1j4CUuM5vPXv3GC3D0L1F0eQdw="
     }
   },
   "cacheBootResources": true,

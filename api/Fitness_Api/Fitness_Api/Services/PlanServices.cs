@@ -49,6 +49,23 @@ public class PlanServices : IPlanServices
             plan.TrainerId = user.Trainer_Id.Value;
         }
 
+        if (!_context.Clients.Any(x => x.Id == plan.ClientId))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Выберите клиента" }));
+        }
+
+        if (!_context.Trainers.Any(x => x.Id == plan.TrainerId))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Выберите тренера" }));
+        }
+
+        if (string.IsNullOrWhiteSpace(plan.TrainingPlan) && string.IsNullOrWhiteSpace(plan.NutritionPlan))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Введите план тренировок или питания" }));
+        }
+
+        plan.TrainingPlan = plan.TrainingPlan.Trim();
+        plan.NutritionPlan = plan.NutritionPlan.Trim();
         _context.Plans.Add(plan);
         _context.SaveChanges();
 

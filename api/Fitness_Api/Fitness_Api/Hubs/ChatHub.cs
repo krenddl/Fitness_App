@@ -110,8 +110,13 @@ public class ChatHub : Hub
 
     private User? GetCurrentUser()
     {
-        var token = Context.GetHttpContext()?.Request.Query["access_token"].FirstOrDefault()
-            ?? Context.GetHttpContext()?.Request.Headers["Authorization"].FirstOrDefault();
+        var httpContext = Context.GetHttpContext();
+        var token = httpContext?.Request.Query["access_token"].FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            token = httpContext?.Request.Headers["Authorization"].FirstOrDefault();
+        }
 
         return _sessionResolver.GetUser(token);
     }

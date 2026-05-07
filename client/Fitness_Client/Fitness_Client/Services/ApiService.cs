@@ -41,6 +41,12 @@ public class ApiService
         return await _http.GetFromJsonAsync<List<ClientModel>>("api/clients");
     }
 
+    public async Task<HttpResponseMessage> AddClient(ClientModel model)
+    {
+        await ApplyAuthHeaderAsync();
+        return await _http.PostAsJsonAsync("api/clients", model);
+    }
+
     public async Task<ClientModel?> GetMyClient()
     {
         await ApplyAuthHeaderAsync();

@@ -1,5 +1,6 @@
 using Fitness_Api.Data;
 using Fitness_Api.Interfaces;
+using Fitness_Api.Models;
 using Fitness_Api.UniversalMethods;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,26 @@ public class ClientServices : IClientServices
     public Task<IActionResult> GetAllClients()
     {
         return Task.FromResult<IActionResult>(new OkObjectResult(_context.Clients.OrderBy(x => x.FullName).ToList()));
+    }
+
+    public Task<IActionResult> CreateClient(Client client)
+    {
+        if (string.IsNullOrWhiteSpace(client.FullName))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = "Введите ФИО клиента"
+            }));
+        }
+
+        client.FullName = client.FullName.Trim();
+        client.Phone = client.Phone?.Trim() ?? string.Empty;
+
+        _context.Clients.Add(client);
+        _context.SaveChanges();
+
+        return Task.FromResult<IActionResult>(new OkObjectResult(client));
     }
 
     public Task<IActionResult> GetMyClient(string token)

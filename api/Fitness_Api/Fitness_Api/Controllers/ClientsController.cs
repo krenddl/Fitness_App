@@ -1,5 +1,6 @@
 using Fitness_Api.CustomAtributes;
 using Fitness_Api.Interfaces;
+using Fitness_Api.Models;
 using Fitness_Api.UniversalMethods;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,13 @@ public class ClientsController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         return await _clientServices.GetAllClients();
+    }
+
+    [HttpPost]
+    [RoleAuthorize([RoleIds.Administrator, RoleIds.SalesManager])]
+    public async Task<IActionResult> Create([FromBody] Client client)
+    {
+        return await _clientServices.CreateClient(client);
     }
 
     [HttpGet("Me")]

@@ -25,6 +25,8 @@ public class MembershipServices : IMembershipServices
             return Task.FromResult<IActionResult>(new UnauthorizedObjectResult(new { status = false, message = "Сессия не найдена" }));
         }
 
+        ExpireOldMemberships();
+
         var memberships = user.Role_Id switch
         {
             RoleIds.Administrator or RoleIds.SalesManager => _context.Memberships.OrderByDescending(x => x.EndDate).ToList(),
@@ -37,8 +39,51 @@ public class MembershipServices : IMembershipServices
 
     public Task<IActionResult> CreateMembership(Membership membership)
     {
+        if (!_context.Clients.Any(x => x.Id == membership.ClientId))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = "Выберите существующего клиента"
+            }));
+        }
+
+        if (string.IsNullOrWhiteSpace(membership.Type))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = "Выберите тип абонемента"
+            }));
+        }
+
+        membership.Type = NormalizeMembershipType(membership.Type);
+        var days = GetMembershipDays(membership.Type);
+        if (days == 0)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = "Выберите существующий тариф"
+            }));
+        }
+
+        membership.StartDate = DateTime.SpecifyKind(membership.StartDate.Date, DateTimeKind.Unspecified);
+        membership.EndDate = DateTime.SpecifyKind(membership.StartDate.AddDays(days - 1), DateTimeKind.Unspecified);
+
+        var overlap = FindOverlap(membership.ClientId, membership.StartDate, membership.EndDate);
+
+        if (overlap is not null)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = $"У клиента уже есть абонемент на этот период: {overlap.Type}, до {overlap.EndDate:dd.MM.yyyy}"
+            }));
+        }
+
         var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
-        membership.Status = membership.EndDate < now ? MembershipStatus.Expired : MembershipStatus.Active;
+        membership.Status = membership.EndDate.Date < now.Date ? MembershipStatus.Expired : MembershipStatus.Active;
         _context.Memberships.Add(membership);
         _context.SaveChanges();
 
@@ -66,7 +111,7 @@ public class MembershipServices : IMembershipServices
             return Task.FromResult<IActionResult>(new NotFoundObjectResult(new { status = false, message = "Абонемент не найден" }));
         }
 
-        membership.Status = membership.EndDate < DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
+        membership.Status = membership.EndDate.Date < DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date
             ? MembershipStatus.Expired
             : MembershipStatus.Active;
 
@@ -82,10 +127,26 @@ public class MembershipServices : IMembershipServices
             return Task.FromResult<IActionResult>(new NotFoundObjectResult(new { status = false, message = "Абонемент не найден" }));
         }
 
-        membership.EndDate = membership.EndDate.AddDays(days);
+        if (days <= 0)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Количество дней должно быть больше нуля" }));
+        }
+
+        var newEndDate = DateTime.SpecifyKind(membership.EndDate.AddDays(days).Date, DateTimeKind.Unspecified);
+        var overlap = FindOverlap(membership.ClientId, membership.StartDate, newEndDate, membership.Id);
+        if (overlap is not null)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new
+            {
+                status = false,
+                message = $"Продление пересекается с другим абонементом: {overlap.Type}, до {overlap.EndDate:dd.MM.yyyy}"
+            }));
+        }
+
+        membership.EndDate = newEndDate;
         if (membership.Status != MembershipStatus.Frozen)
         {
-            membership.Status = membership.EndDate < DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
+            membership.Status = membership.EndDate.Date < DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date
                 ? MembershipStatus.Expired
                 : MembershipStatus.Active;
         }
@@ -96,17 +157,70 @@ public class MembershipServices : IMembershipServices
 
     public Task<IActionResult> GetReminders()
     {
+        ExpireOldMemberships();
+        var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
         var due = _context.Memberships
-            .Where(x => !x.ReminderSent && x.EndDate <= DateTime.SpecifyKind(DateTime.Now.AddDays(3), DateTimeKind.Unspecified))
+            .Where(x => x.Status == MembershipStatus.Active
+                && x.EndDate.Date >= now.Date
+                && x.EndDate.Date <= now.AddDays(3).Date)
             .ToList();
-
-        foreach (var membership in due)
-        {
-            membership.ReminderSent = true;
-        }
-        _context.SaveChanges();
 
         var result = due.Select(x => new { x.Id, x.ClientId, x.EndDate }).ToList();
         return Task.FromResult<IActionResult>(new OkObjectResult(result));
+    }
+
+    private string NormalizeMembershipType(string type)
+    {
+        type = type.Trim();
+
+        return type switch
+        {
+            "Разовый" => "Разовое посещение",
+            "Разовое" => "Разовое посещение",
+            _ => type
+        };
+    }
+
+    private int GetMembershipDays(string type)
+    {
+        return type switch
+        {
+            "Разовое посещение" => 1,
+            "Дневной" => 30,
+            "Стандарт" => 30,
+            "Премиум" => 30,
+            "Безлимит" => 90,
+            _ => 0
+        };
+    }
+
+    private Membership? FindOverlap(int clientId, DateTime startDate, DateTime endDate, int? ignoreId = null)
+    {
+        return _context.Memberships.FirstOrDefault(x =>
+            x.ClientId == clientId
+            && x.Id != ignoreId
+            && x.Status != MembershipStatus.Expired
+            && x.StartDate.Date <= endDate.Date
+            && startDate.Date <= x.EndDate.Date);
+    }
+
+    private void ExpireOldMemberships()
+    {
+        var today = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified).Date;
+        var oldMemberships = _context.Memberships
+            .Where(x => x.Status == MembershipStatus.Active && x.EndDate.Date < today)
+            .ToList();
+
+        if (!oldMemberships.Any())
+        {
+            return;
+        }
+
+        foreach (var membership in oldMemberships)
+        {
+            membership.Status = MembershipStatus.Expired;
+        }
+
+        _context.SaveChanges();
     }
 }

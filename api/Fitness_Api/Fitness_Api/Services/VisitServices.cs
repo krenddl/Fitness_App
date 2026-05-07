@@ -47,6 +47,11 @@ public class VisitServices : IVisitServices
         var clientId = user.Role_Id == RoleIds.Client ? user.Client_Id ?? 0 : request.ClientId;
         var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
 
+        if (!_context.Clients.Any(x => x.Id == clientId))
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Клиент не найден" }));
+        }
+
         var activeVisit = _context.Visits.FirstOrDefault(x => x.ClientId == clientId && x.ExitedAt == null);
         if (activeVisit is not null)
         {
@@ -60,7 +65,8 @@ public class VisitServices : IVisitServices
         var hasMembership = _context.Memberships.Any(x =>
             x.ClientId == clientId &&
             x.Status == MembershipStatus.Active &&
-            x.EndDate >= now);
+            x.StartDate.Date <= now.Date &&
+            x.EndDate.Date >= now.Date);
 
         if (!hasMembership)
         {
@@ -96,6 +102,11 @@ public class VisitServices : IVisitServices
         if (user.Role_Id == RoleIds.Client && user.Client_Id != visit.ClientId)
         {
             return Task.FromResult<IActionResult>(new ObjectResult(new { status = false, message = "Недостаточно прав" }) { StatusCode = 403 });
+        }
+
+        if (visit.ExitedAt is not null)
+        {
+            return Task.FromResult<IActionResult>(new BadRequestObjectResult(new { status = false, message = "Выход уже отмечен" }));
         }
 
         visit.ExitedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);

@@ -78,12 +78,22 @@ public class CommunicationServices : ICommunicationServices
             return new BadRequestObjectResult(new { status = false, message = "Невозможно определить участников чата" });
         }
 
+        if (!_context.Trainers.Any(x => x.Id == trainerId) || !_context.Clients.Any(x => x.Id == clientId))
+        {
+            return new BadRequestObjectResult(new { status = false, message = "Клиент или тренер не найден" });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Text))
+        {
+            return new BadRequestObjectResult(new { status = false, message = "Введите сообщение" });
+        }
+
         var message = new ChatMessage
         {
             TrainerId = trainerId,
             ClientId = clientId,
             SenderRole = senderRole,
-            Text = request.Text,
+            Text = request.Text.Trim(),
             SentAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
         };
 
@@ -111,10 +121,20 @@ public class CommunicationServices : ICommunicationServices
 
     public async Task<IActionResult> SendPush(SendPushRequest request)
     {
+        if (!_context.Clients.Any(x => x.Id == request.ClientId))
+        {
+            return new BadRequestObjectResult(new { status = false, message = "Клиент не найден" });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Text))
+        {
+            return new BadRequestObjectResult(new { status = false, message = "Введите текст уведомления" });
+        }
+
         var push = new PushNotification
         {
             ClientId = request.ClientId,
-            Text = request.Text,
+            Text = request.Text.Trim(),
             SentAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified)
         };
 
